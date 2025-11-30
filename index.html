@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Revert theme-color to light/gray -->
     <meta name="theme-color" content="#f0f4f8">
     
     <title>Nann Emulator</title>
@@ -41,7 +40,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            /* REVERTED: Light, neutral background */
+            /* Light, neutral background */
             background-color: #f0f4f8; 
             overflow: hidden;
             height: 100vh; 
@@ -67,7 +66,7 @@
             --console-width: 440px; 
             --console-height: 760px; 
 
-            /* CRITICAL CHANGE 1: GameBoy Red color */
+            /* GameBoy Red color */
             background-color: #E83942; 
             width: var(--console-width); 
             height: var(--console-height);
@@ -113,12 +112,14 @@
         .power-led {
             width: 10px;
             height: 10px;
+            /* Initial state: Dark/Off */
             background-color: #1c1c1c; 
             border-radius: 50%;
             box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7);
             transition: background-color 0.2s;
         }
         .power-led.on {
+            /* Active state: Red/Glowing */
             background-color: #ff0000; 
             box-shadow: 0 0 8px #ff3333, inset 0 0 5px rgba(255, 255, 255, 0.7);
             animation: led-glow 1.5s infinite alternate ease-in-out;
@@ -166,8 +167,49 @@
             border: none;
             background-color: transparent; 
         }
+        
+        /* Menu UI Styling - Now fixed to screen size and using 'justify-center' to vertically center content */
+        .menu-ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white; /* White background for menus */
+            padding: 20px; /* Reduced padding slightly */
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            /* FIX: Use 'justify-center' to vertically center contents within the available screen space */
+            justify-content: center; 
+            z-index: 100;
+        }
 
-        /* CRITICAL CHANGE 2: Engraved NANN EMULATOR Text Style */
+        /* Input File Styling */
+        #file-input {
+            display: none; /* Hide default input */
+        }
+
+        /* CUSTOM STYLING FOR FILE UPLOAD LABEL (Red) */
+        .upload-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            /* Red */
+            background-color: #dc2626; /* red-600 */ 
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .upload-label:hover {
+            background-color: #b91c1c; /* red-700 */
+        }
+
+
+        /* Engraved NANN EMULATOR Text Style */
         .nann-brand {
             font-family: 'Inter', sans-serif;
             font-style: italic;
@@ -238,26 +280,30 @@
 
         .dpad-up { top: 0; left: 42px; } .dpad-down { bottom: 0; left: 42px; } .dpad-left { top: 42px; left: 0; } .dpad-right { top: 42px; right: 0; }
 
-        /* --- Action Buttons --- */
+        /* --- Action Buttons (A/B) --- */
         .action-buttons {
             position: absolute; top: 60px; right: 30px; width: 150px; height: 80px; transform: rotate(-20deg);
         }
-        .btn-round {
+        /* Shared engraved style for round buttons (A/B, Load/Keymap) */
+        .btn-round, .btn-util {
+            /* Basic button size and shape */
             width: 60px; height: 60px; 
             background-color: #1c1c1c; 
             border-radius: 50%; 
             display: flex; 
             align-items: center; 
             justify-content: center;
-            box-shadow: 
-                inset 3px 3px 8px rgba(255,255,255,0.2), 
-                inset -3px -3px 8px rgba(0,0,0,0.5), 
-                0 6px 0 #000; 
             cursor: pointer; 
             position: absolute; 
             user-select: none; 
             -webkit-tap-highlight-color: transparent; 
             transition: transform 0.1s, box-shadow 0.1s;
+            
+            /* Engraved Style */
+            box-shadow: 
+                inset 3px 3px 8px rgba(255,255,255,0.2), 
+                inset -3px -3px 8px rgba(0,0,0,0.5), 
+                0 6px 0 #000; 
             
             /* Engraved Font Style */
             color: rgba(0,0,0,0.5); 
@@ -267,8 +313,8 @@
             text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15); 
         }
         /* Used for both :active and .pressed state */
-        .btn-round:active, .btn-round.pressed {
-            transform: translateY(4px); 
+        .btn-round.pressed, .btn-util.pressed {
+            transform: translateY(4px) !important; 
             box-shadow: 
                 inset 3px 3px 8px rgba(255,255,255,0.2), 
                 inset -3px -3px 8px rgba(0,0,0,0.5), 
@@ -277,7 +323,7 @@
         .btn-b { bottom: 0; left: 0; } 
         .btn-a { top: 0; right: 0; }
         
-        /* --- Meta Buttons (Start/Select) --- */
+        /* --- Meta Buttons (Start/Select/Load/Keymap) --- */
         .meta-buttons {
             position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; 
         }
@@ -290,116 +336,94 @@
             cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.1s, box-shadow 0.1s;
         }
         /* Used for both :active and .pressed state */
-        .btn-pill:active, .btn-pill.pressed {
+        .btn-pill.pressed {
             transform: rotate(-25deg) translateY(2px);
             box-shadow: 
                 inset 2px 2px 5px rgba(255,255,255,0.3), 
                 inset -2px -2px 5px rgba(0,0,0,0.5),
                 0 2px 0 #4b5563; 
         }
-        .meta-label {
-            font-size: 11px; color: #7c3aed; text-align: center; margin-top: 10px; transform: rotate(-25deg); font-weight: bold; letter-spacing: 0.5px; user-select: none;
-        }
-
-        /* --- Overlay Styles (Menu) --- */
-        .menu-ui, #key-binding-menu, #upload-menu, #key-selection-modal { 
-            background-color: rgba(31, 41, 55, 0.95); 
-            color: #f3f4f6;
-            width: 100%; 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
+        
+        /* NEW FONT: Monospace for all meta labels (START/SELECT/LOAD ROM/KEY MAP) */
+        .meta-label, .btn-util-label {
+            font-size: 11px; 
+            color: #000000; /* Black font color */
             text-align: center; 
-            padding: 10px; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            z-index: 100;
-            border-radius: 15px;
-        }
-        #key-binding-menu, #upload-menu, #key-selection-modal { 
-            display: none; 
-            z-index: 200; 
+            font-weight: 900; /* Extra bold */
+            letter-spacing: 1px; /* Increased spacing */
+            user-select: none;
+            font-family: 'Courier New', Courier, monospace; /* Changed Font to Monospace */
         }
         
-        /* Key Bindings List Styling */
-        #bindings-list {
-            max-height: 70%; 
-            overflow-y: auto;
-            padding-right: 15px; 
-            width: 100%;
+        .meta-label {
+             margin-top: 10px; 
+             transform: rotate(-25deg); 
+        }
+        
+        .btn-util-label {
+            margin-top: 5px; 
+        }
+
+
+        /* Utility Buttons Area (Load ROM / Key Map) - Now hidden */
+        .utility-buttons {
+            position: absolute; bottom: 200px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px;
+            /* HIDDEN per user request */
+            display: none; 
+        }
+
+        .util-btn-group {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-
+        
+        /* .btn-util styling is now shared with .btn-round above */
+        .btn-util {
+            width: 50px; 
+            height: 50px; 
+            position: relative;
+        }
+        
+        /* Style for virtual key buttons */
+        .virtual-key-btn {
+            padding: 10px;
+            background-color: #f0f4f8;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+        .virtual-key-btn:hover {
+            background-color: #e2e8f0;
+        }
+        
+        /* Style for binding list */
         .binding-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            width: 300px;
-            max-width: 90%;
-            margin: 8px 0;
-            padding: 6px 10px;
-            border-radius: 8px;
-            background-color: #374151; 
+            width: 250px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
         }
+        
         .binding-key {
-            font-weight: 700;
-            color: #f87171; 
-            padding: 4px 8px;
-            border: 1px solid #9ca3af;
+            padding: 2px 8px;
+            background-color: #eee;
             border-radius: 4px;
-            min-width: 60px;
+            cursor: pointer;
+            font-family: monospace;
+            min-width: 50px;
             text-align: center;
-            cursor: pointer;
-            user-select: none;
-            background-color: #1f2937; 
         }
-        .active-binding {
-            background-color: #b91c1c; 
-            color: white;
-            border-color: #ef4444;
-            animation: pulse-red 1s infinite alternate;
+        
+        .binding-key.active-binding {
+            background-color: #fca5a5; /* Red-300 */
+            color: #b91c1c; /* Red-700 */
+            box-shadow: 0 0 5px #fca5a5;
         }
-        @keyframes pulse-red {
-            from { opacity: 0.7; }
-            to { opacity: 1.0; }
-        }
-
-        /* Virtual Keypad Styling */
-        #virtual-keypad {
-            max-height: 70%; 
-            overflow-y: auto;
-        }
-
-        .virtual-key-btn {
-            padding: 12px 6px;
-            background-color: #3b82f6; 
-            color: white;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.1s;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            text-transform: uppercase;
-        }
-        .virtual-key-btn:active {
-            background-color: #2563eb; 
-            transform: translateY(1px);
-            box-shadow: none;
-        }
-
-        #file-input { opacity: 0; width: 0.1px; height: 0.1px; position: absolute; overflow: hidden; z-index: -1; }
-        .upload-label {
-            cursor: pointer; padding: 12px 24px; background-color: #4f46e5; color: white; border-radius: 8px; font-weight: bold; transition: background-color 0.2s, transform 0.1s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .upload-label:hover { background-color: #4338ca; }
-        .upload-label:active { transform: translateY(1px); box-shadow: none; }
         
     </style>
 </head>
@@ -424,31 +448,36 @@
                     
                     <iframe id="game-iframe" src="about:blank" allow="keyboard; game" referrerpolicy="no-referrer"></iframe>
                     
-                    <!-- Key Binding Menu -->
+                    <!-- Key Binding Menu (White background, Dark text) -->
                     <div id="key-binding-menu" class="menu-ui">
-                        <h2 class="text-xl font-bold mb-4 text-white">Key Bindings</h2>
-                        <div id="bindings-list" class="mb-6"></div>
-                        <button id="btn-close-key-map" class="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition">Close Menu</button>
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">Key Bindings</h2>
+                        <!-- ADDED max-h-48 and overflow-y-auto to allow scrolling only of the list -->
+                        <div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div>
+                        <!-- Added margin-top to separate button from the list -->
+                        <button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close Menu</button>
                     </div>
 
-                    <!-- Virtual Keypad for Mobile Binding -->
+                    <!-- Virtual Keypad for Mobile Binding (White background, Dark text) -->
                     <div id="key-selection-modal" class="menu-ui" style="display: none; z-index: 300;">
-                        <h2 class="text-xl font-bold mb-4 text-white">Select New Key for <span id="binding-label-display" class="text-indigo-400"></span></h2>
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">Select New Key for <span id="binding-label-display" class="text-red-600"></span></h2>
                         <div id="virtual-keypad" class="grid grid-cols-4 gap-4 p-4 max-w-sm overflow-y-auto" style="max-height: 70%;">
                             <!-- Keys injected by script -->
                         </div>
                         <button id="btn-cancel-key-select" class="mt-4 px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Cancel</button>
                     </div>
 
-                    <!-- Upload Menu -->
+                    <!-- Upload Menu (White background, Dark text) -->
+                    <!-- The menu-ui class now handles vertical centering -->
                     <div id="upload-menu" class="menu-ui">
-                        <h2 class="text-xl font-bold mb-6 text-white">Load Game ROM (HTML)</h2>
+                        <h2 class="text-xl font-bold mb-6 text-gray-800">Load Game ROM (HTML)</h2>
                         <input type="file" id="file-input" accept=".html,text/html">
+                        <!-- Upload button Lable Class is Red -->
                         <label for="file-input" class="upload-label mb-4">
                             <svg class="w-5 h-5 inline-block mr-2 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                             Choose .html File
                         </label>
-                        <p id="file-status" class="text-sm text-gray-400 mb-8">No file selected. Only local HTML files are supported.</p>
+                        <p id="file-status" class="text-sm text-gray-600 mb-8">No file selected. Only local HTML files are supported.</p>
+                        <!-- Close Upload button is Gray -->
                         <button id="btn-close-upload" class="px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Back to Game</button>
                     </div>
                     
@@ -476,21 +505,33 @@
                     <!-- Engraved A -->
                     <div class="btn-round btn-a" id="btn-a" data-label="A">A</div>
                 </div>
+                
+                <!-- UTILITY BUTTONS AREA (Load/Key Map) - HIDDEN -->
+                <div class="utility-buttons" style="display: none;"> 
+                    <div class="util-btn-group">
+                        <div class="btn-util" id="btn-load-rom-menu" data-label="Load Menu">F</div>
+                        <div class="util-btn-label">LOAD ROM</div>
+                    </div>
+                    
+                    <div class="util-btn-group">
+                        <div class="btn-util" id="btn-key-map-menu" data-label="Key Map">K</div>
+                        <div class="util-btn-label">KEY MAP</div>
+                    </div>
+                </div>
 
+                <!-- START / SELECT (Bottom Meta) -->
                 <div class="meta-buttons">
                     <div class="flex flex-col items-center">
+                        <!-- SELECT (Triggers Load ROM Menu on Tap) -->
                         <div class="btn-pill" id="btn-select" data-label="Select"></div>
                         <div class="meta-label">SELECT</div>
                     </div>
                     <div class="flex flex-col items-center">
+                        <!-- START (Triggers Key Map Menu on Tap) -->
                         <div class="btn-pill" id="btn-start" data-label="Start"></div>
                         <div class="meta-label">START</div>
                     </div>
                 </div>
-                
-                <!-- CRITICAL CHANGE 3: Complementary Teal Buttons -->
-                <button id="btn-key-map-menu" class="absolute bottom-24 right-5 bg-[#20c997] text-white p-2 rounded-full shadow-lg hover:bg-[#18a87b] transition text-xs" style="transform: rotate(-25deg); width: 80px;">KEY MAP</button>
-                <button id="btn-load-rom-menu" class="absolute bottom-24 left-5 bg-[#20c997] text-white p-2 rounded-full shadow-lg hover:bg-[#18a87b] transition text-xs" style="transform: rotate(25deg); width: 80px;">LOAD ROM</button>
             </div>
         </div>
     </div>
@@ -546,18 +587,20 @@
         ];
         
         let virtualKeyStates = {};
+        let isAuthReady = false;
 
         async function initFirebase() {
             const loadingOverlay = document.getElementById('loading-overlay');
+            // const powerLed = document.getElementById('power-led'); // Now controlled only on load/unload
+
+            // DO NOT turn on the LED here. It stays off until a game is loaded.
             
-            // CRITICAL FIX: If not in Canvas environment, skip Firebase setup entirely
             if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) {
                 console.warn("Firebase configuration not found. Running in local/deployed mode.");
                 
-                // Hide overlay in non-Firebase environments
                 loadingOverlay.style.display = 'none';
-                
-                loadKeyMap(); // Still load keymap from local storage
+                isAuthReady = true;
+                loadKeyMap(); 
                 return;
             }
 
@@ -574,15 +617,14 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
-                        loadKeyMap();
-                        // Hide loading overlay after successful auth
-                        setTimeout(() => {
-                            loadingOverlay.style.display = 'none';
-                        }, 500);
                     } else {
                         userId = null;
-                        loadingOverlay.style.display = 'flex';
                     }
+                    isAuthReady = true;
+                    loadKeyMap();
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                    }, 500);
                 });
             } catch (error) {
                 console.error("Firebase Auth Error:", error);
@@ -620,6 +662,9 @@
         }
 
         function handleGlobalKey(e) {
+            if (!isAuthReady) return;
+
+            // Handle Menu Escape
             if (currentMenu !== null && e.type === 'keydown') {
                 if (e.key === "Escape") {
                     if (currentMenu === 'keyselect') {
@@ -649,30 +694,24 @@
                 e.preventDefault();
                 e.stopPropagation();
 
+                // Send message and update visual state
+                handleVirtualPress(label, isDown, true); 
+                
                 // D-Pad visual feedback (press the whole arm)
                 if (['Up', 'Down', 'Left', 'Right'].includes(label)) {
                     const dpadArmH = document.querySelector('.dpad-h');
                     const dpadArmV = document.querySelector('.dpad-v');
-                    
-                    // Handle virtual press first
-                    handleVirtualPress(label, isDown, false); 
                     
                     if (isDown) {
                         if (label === 'Left' || label === 'Right') dpadArmH?.classList.add('pressed-arm');
                         if (label === 'Up' || label === 'Down') dpadArmV?.classList.add('pressed-arm');
                     } else {
                         // Check if the opposite direction is still pressed to keep the arm down
-                        const isHorizontal = virtualKeyStates['Left'] || virtualKeyStates['Right'];
-                        const isVertical = virtualKeyStates['Up'] || virtualKeyStates['Down'];
-                        if (!isHorizontal) dpadArmH?.classList.remove('pressed-arm');
-                        if (!isVertical) dpadArmV?.classList.remove('pressed-arm');
+                        const isHorizontalHeld = virtualKeyStates['Left'] || virtualKeyStates['Right'];
+                        const isVerticalHeld = virtualKeyStates['Up'] || virtualKeyStates['Down'];
+                        if (!isHorizontalHeld) dpadArmH?.classList.remove('pressed-arm');
+                        if (!isVerticalHeld) dpadArmV?.classList.remove('pressed-arm');
                     }
-                }
-                
-                // If it's a D-Pad button, it already called handleVirtualPress(..., false) above.
-                // Call handleVirtualPress again with shouldSendMessage=true only for non-Dpad buttons.
-                if (!['Up', 'Down', 'Left', 'Right'].includes(label)) {
-                    handleVirtualPress(label, isDown);
                 }
             } 
         }
@@ -687,24 +726,16 @@
         function handleVirtualPress(label, isDown, shouldSendMessage = true) {
             const currentState = virtualKeyStates[label] || false;
             
+            // Only send keydown message if state changes from up to down
             if (isDown && !currentState) {
                 virtualKeyStates[label] = true;
                 if (shouldSendMessage) sendKey(label, true);
-            } else if (!isDown && currentState) {
+            } 
+            // Only send keyup message if state changes from down to up
+            else if (!isDown && currentState) {
                 virtualKeyStates[label] = false;
                 if (shouldSendMessage) sendKey(label, false);
             }
-        }
-
-        function handlePress(label, isDown, element = null, e = null) {
-            // Prevent interaction when menu is open
-            if (currentMenu !== null) {
-                if (e && (e.type === 'touchstart' || e.type === 'mousedown')) e.preventDefault();
-                return;
-            }
-            if (e && (e.type === 'touchstart' || e.type === 'mousedown')) e.preventDefault();
-            handleVisualPress(element, isDown);
-            handleVirtualPress(label, isDown);
         }
 
         function sendKey(label, isDown) {
@@ -741,7 +772,8 @@
                 btn.className = 'virtual-key-btn';
                 btn.textContent = vKey.display;
                 
-                const keyCode = vKey.keyCode || vKey.key.toUpperCase().charCodeAt(0);
+                // Get the appropriate key code
+                const keyCode = vKey.keyCode || (vKey.key.length === 1 ? vKey.key.toUpperCase().charCodeAt(0) : undefined);
 
                 btn.addEventListener('click', () => {
                     keyMap[label] = { 
@@ -760,12 +792,13 @@
             document.getElementById(`binding-key-${activeBindingLabel}`)?.classList.remove('active-binding');
             document.getElementById('key-selection-modal').style.display = 'none';
             activeBindingLabel = null;
+            // Return to parent menu state
             currentMenu = 'keymap';
         }
         // ------------------------------------
 
         function toggleKeyBindingMenu() {
-            if (currentMenu === 'upload') return;
+            if (currentMenu === 'upload' || currentMenu === 'keyselect') return;
             const menu = document.getElementById('key-binding-menu');
             if (currentMenu === 'keymap') {
                 currentMenu = null;
@@ -778,7 +811,7 @@
         }
 
         function toggleUploadMenu() {
-            if (currentMenu === 'keymap') return;
+            if (currentMenu === 'keymap' || currentMenu === 'keyselect') return;
             const menu = document.getElementById('upload-menu');
             if (currentMenu === 'upload') {
                 currentMenu = null;
@@ -795,7 +828,7 @@
             const iframe = document.getElementById('game-iframe');
             const powerLed = document.getElementById('power-led'); // Get LED element
 
-            // Turn off LED immediately on upload attempt
+            // Turn off LED during load attempt
             powerLed.classList.remove('on'); 
 
             if (!file) { fileStatus.textContent = "No file selected."; return; }
@@ -878,7 +911,7 @@
                          iframe.onload = null;
                          iframe.contentWindow.focus();
                          
-                         // Turn LED ON after successful load
+                         // *** LED FIX: Turn LED ON after successful load ***
                          powerLed.classList.add('on');
                     };
                     iframe.src = blobUrl;
@@ -891,21 +924,113 @@
         }
 
         function setupControlListeners() {
-            const controls = document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill');
-            controls.forEach(control => {
-                const label = control.getAttribute('data-label');
-                // Use mousedown/mouseup for desktop/mouse
-                control.addEventListener('mousedown', (e) => handlePress(label, true, control, e));
-                document.addEventListener('mouseup', (e) => handlePress(label, false, control, e)); // Listen on document for missed releases
+            // Find all buttons that should act as game controls (D-Pad, A, B, Select, Start)
+            const gameControls = document.querySelectorAll('.dpad-btn, .btn-round, .btn-pill');
+            
+            // Define a tap threshold in milliseconds
+            const TAP_THRESHOLD_MS = 300; 
 
-                // Use touch events for mobile
-                control.addEventListener('touchstart', (e) => handlePress(label, true, control, e), { passive: false });
-                document.addEventListener('touchend', (e) => handlePress(label, false, control, e)); // Listen on document for global release
-                document.addEventListener('touchcancel', (e) => handlePress(label, false, control, e));
+            const pressHandler = (e) => {
+                if (!isAuthReady) return; 
+
+                // Prevent default behavior (like scrolling on touch) for ALL controls
+                // This is CRITICAL for mobile responsiveness and prevents scrolling when using the D-pad
+                e.preventDefault(); 
+                e.stopPropagation();
+
+                // If a menu is open, block all game controls
+                if (currentMenu !== null) return; 
+                
+                const control = e.currentTarget;
+                const label = control.getAttribute('data-label');
+                
+                // Set the tap state and time for tap detection
+                control.pressTime = Date.now();
+                control.isTap = true;
+                
+                handleVisualPress(control, true);
+                
+                // D-Pad Arm visual handling
+                if (['Up', 'Down', 'Left', 'Right'].includes(label)) {
+                    const dpadArmH = document.querySelector('.dpad-h');
+                    const dpadArmV = document.querySelector('.dpad-v');
+                    if (label === 'Left' || label === 'Right') dpadArmH?.classList.add('pressed-arm');
+                    if (label === 'Up' || label === 'Down') dpadArmV?.classList.add('pressed-arm');
+                }
+                
+                // Send keydown message immediately for all controls
+                handleVirtualPress(label, true, true); 
+            };
+
+            const releaseHandler = (e) => {
+                if (!isAuthReady) return; 
+
+                // If a menu is open, block all game controls
+                if (currentMenu !== null) return; 
+                
+                // Find the original target if this is a global release handler
+                const control = e.currentTarget;
+                const label = control.getAttribute('data-label');
+
+                // Send keyup message
+                handleVirtualPress(label, false, true); 
+
+                // Visual release
+                handleVisualPress(control, false);
+                
+                // --- TAP/MENU LOGIC for SELECT/START ---
+                if (['Select', 'Start'].includes(label) && control.isTap) {
+                    const duration = Date.now() - (control.pressTime || 0);
+                    
+                    if (duration < TAP_THRESHOLD_MS) {
+                        // This was a quick tap, treat it as a menu toggle
+                        if (label === 'Select') {
+                            toggleUploadMenu(); // Select = Load ROM Menu
+                        } else if (label === 'Start') {
+                            toggleKeyBindingMenu(); // Start = Key Bindings Menu
+                        }
+                    }
+                }
+                
+                // Reset tap state
+                control.isTap = false;
+                
+                // D-Pad Arm visual handling (only on release)
+                if (['Up', 'Down', 'Left', 'Right'].includes(label)) {
+                    const dpadArmH = document.querySelector('.dpad-h');
+                    const dpadArmV = document.querySelector('.dpad-v');
+                    
+                    // Check if the *opposite* direction is still held down before removing the arm class
+                    const isHorizontalHeld = virtualKeyStates['Left'] || virtualKeyStates['Right'];
+                    const isVerticalHeld = virtualKeyStates['Up'] || virtualKeyStates['Down'];
+
+                    if (label === 'Left' || label === 'Right') {
+                         if (!isHorizontalHeld) dpadArmH?.classList.remove('pressed-arm');
+                    }
+                    if (label === 'Up' || label === 'Down') {
+                         if (!isVerticalHeld) dpadArmV?.classList.remove('pressed-arm');
+                    }
+                }
+            };
+            
+            // Set up all listeners
+            gameControls.forEach(control => {
+                // Attach press handlers (mousedown/touchstart)
+                control.addEventListener('mousedown', pressHandler);
+                control.addEventListener('touchstart', pressHandler, { passive: false });
+                
+                // Attach release handlers (mouseup/touchend)
+                // We attach the release directly to the control to capture the data-label and tap state reliably
+                control.addEventListener('mouseup', releaseHandler);
+                control.addEventListener('touchend', releaseHandler);
+                control.addEventListener('touchcancel', releaseHandler);
+                
+                // Prevent native click handling, as tap detection handles the menu toggle
+                control.addEventListener('click', (e) => e.stopPropagation());
             });
-            document.getElementById('btn-key-map-menu')?.addEventListener('click', toggleKeyBindingMenu);
+            
+            // --- Menu Closers & File Handlers (Keep click listeners for these simple UI elements) ---
             document.getElementById('btn-close-key-map')?.addEventListener('click', toggleKeyBindingMenu);
-            document.getElementById('btn-load-rom-menu')?.addEventListener('click', toggleUploadMenu);
             document.getElementById('btn-close-upload')?.addEventListener('click', toggleUploadMenu);
             document.getElementById('file-input')?.addEventListener('change', handleFileUpload);
             document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection);
@@ -919,21 +1044,17 @@
             const wrapper = document.getElementById('console-wrapper');
             if (!wrapper) return;
 
-            // Read the fixed virtual size from CSS variables
             const style = getComputedStyle(document.querySelector('.gbc-body'));
-            const consoleWidth = parseFloat(style.getPropertyValue('--console-width')); // 440
-            const consoleHeight = parseFloat(style.getPropertyValue('--console-height')); // 760
+            const consoleWidth = parseFloat(style.getPropertyValue('--console-width')); 
+            const consoleHeight = parseFloat(style.getPropertyValue('--console-height')); 
             
-            // Get the actual available viewport dimensions
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
             
-            // Calculate scale factors directly based on screen vs console size
+            // Use 98% of the available space to prevent scrollbars
             const scaleX = windowWidth / consoleWidth;
             const scaleY = windowHeight / consoleHeight;
             
-            // Use the smaller scale factor, clamped at 1 (don't zoom beyond actual size)
-            // We use a small buffer (e.g., 0.98) in the ratio calculation to guarantee no scrollbars appear due to floating point math
             const scale = Math.min(scaleX * 0.98, scaleY * 0.98, 1);
             
             wrapper.style.transform = `scale(${scale})`;
