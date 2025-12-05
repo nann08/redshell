@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport for robust mobile scaling and safe area handling -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- iOS PWA Meta Tags - MUST BE PRESENT ON LOAD -->
+    <!-- iOS PWA Meta Tags (Critical for iPhone 7) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Nann Boy">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,46 +12,55 @@
     
     <title>Nann Emulator</title>
 
-    <!-- 1. Define Icon Data -->
-    <script>
-        const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
-    </script>
-
-    <!-- 2. Placeholders for PWA Assets -->
-    <link rel="apple-touch-icon" sizes="180x180" id="apple-icon" href="">
-    <link rel="icon" type="image/png" sizes="32x32" id="icon-32" href="">
-    <link rel="icon" type="image/png" sizes="16x16" id="icon-16" href="">
-    <link rel="manifest" id="pwa-manifest" href="">
-
-    <!-- 3. SYNCHRONOUS INJECTION - Runs immediately to ensure iOS sees the icons -->
+    <!-- PWA Setup Script -->
     <script>
         (function() {
+            // 1. The "Green Screen" Icon (Solid #9bbc0f)
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAAA1BMVEWbvA/84NBCAAAASElEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADeDcYqAAE00FRDAAAAAElFTkSuQmCC';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
-            
-            // Set Icons Immediately
-            document.getElementById('apple-icon').href = iconUrl;
-            document.getElementById('icon-32').href = iconUrl;
-            document.getElementById('icon-16').href = iconUrl;
 
-            // Generate Manifest Immediately
-            const manifest = {
-                "name": "Nann Boy",
-                "short_name": "NannBoy",
-                "start_url": ".",
-                "display": "standalone",
-                "background_color": "#7f1d1d",
-                "theme_color": "#7f1d1d",
-                "orientation": "portrait",
-                "icons": [{
-                    "src": iconUrl,
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }]
-            };
-            // Base64 encode the manifest
-            const manifestString = JSON.stringify(manifest);
-            const manifestBase64 = btoa(manifestString);
-            document.getElementById('pwa-manifest').href = `data:application/json;base64,${manifestBase64}`;
+            // 2. Create and inject links dynamically
+            // We do this manually to ensure strict control over what iOS sees vs Android
+            
+            // Icon Link
+            const linkIcon = document.createElement('link');
+            linkIcon.rel = 'apple-touch-icon';
+            linkIcon.href = iconUrl;
+            document.head.appendChild(linkIcon);
+
+            // Standard Favicons
+            const linkFav32 = document.createElement('link');
+            linkFav32.rel = 'icon';
+            linkFav32.type = 'image/png';
+            linkFav32.sizes = '32x32';
+            linkFav32.href = iconUrl;
+            document.head.appendChild(linkFav32);
+
+            // 3. Conditional Manifest Injection
+            // iOS (especially older versions) prefers Meta Tags only.
+            // Providing a Data-URI manifest can break "Standalone" mode on iPhone 7.
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+            if (!isIOS) {
+                const manifest = {
+                    "name": "Nann Boy",
+                    "short_name": "NannBoy",
+                    "start_url": ".",
+                    "display": "standalone",
+                    "background_color": "#7f1d1d",
+                    "theme_color": "#7f1d1d",
+                    "orientation": "portrait",
+                    "icons": [{
+                        "src": iconUrl,
+                        "sizes": "192x192",
+                        "type": "image/png"
+                    }]
+                };
+                const linkManifest = document.createElement('link');
+                linkManifest.rel = 'manifest';
+                linkManifest.href = `data:application/json;base64,${btoa(JSON.stringify(manifest))}`;
+                document.head.appendChild(linkManifest);
+            }
         })();
     </script>
 
@@ -64,8 +72,8 @@
         *, *::before, *::after {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none; /* Disables magnifying glass on iOS */
-            user-select: none; /* Prevents text selection */
+            -webkit-touch-callout: none;
+            user-select: none;
         }
 
         :root {
@@ -92,8 +100,8 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overscroll-behavior: none; /* Prevent pull-to-refresh */
-            position: fixed; /* Lock viewport */
+            overscroll-behavior: none;
+            position: fixed;
             overflow: hidden;
             background-color: var(--bg-color); 
         }
@@ -107,7 +115,7 @@
             align-items: flex-start; 
             justify-content: center;
             overscroll-behavior: none; 
-            touch-action: none; /* Disable browser handling of gestures */
+            touch-action: none;
             margin: 0;
             padding: 0;
         }
@@ -117,7 +125,6 @@
             will-change: transform;
             display: flex;
             justify-content: center;
-            /* Force GPU layer for the whole console */
             transform: translateZ(0);
         }
 
@@ -136,7 +143,7 @@
             align-items: center;
             padding-top: calc(30px + var(--safe-top)); 
             padding-bottom: var(--safe-bottom);
-            contain: content; /* Rendering optimization */
+            contain: content;
         }
 
         .gbc-screen-lens {
@@ -188,7 +195,6 @@
             align-items: center;
             justify-content: center;
             position: relative; 
-            /* GPU Acceleration for Screen */
             transform: translateZ(0);
             backface-visibility: hidden;
         }
@@ -223,8 +229,8 @@
             height: 100%;
             border: none;
             background-color: transparent; 
-            display: none; /* Hidden until loaded */
-            will-change: transform; /* Hint to browser */
+            display: none; 
+            will-change: transform; 
         }
         
         .menu-ui {
@@ -242,7 +248,6 @@
             z-index: 100;
         }
 
-        /* Start Screen */
         #start-screen {
             position: absolute;
             top: 0; left: 0;
@@ -344,7 +349,7 @@
         /* Increased Hit Area for D-Pad */
         .dpad-btn { 
             position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer;
-            will-change: transform; /* Hint for touch responsiveness */
+            will-change: transform; 
         }
         .dpad-btn.pressed { background-color: rgba(255, 255, 255, 0.05); border-radius: 50%; }
         .dpad-up { top: -5px; left: 37px; } .dpad-down { bottom: -5px; left: 37px; } 
@@ -362,7 +367,7 @@
             transition: transform 0.05s, box-shadow 0.05s;
             box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2), inset -3px -3px 6px rgba(0,0,0,0.8), 3px 5px 8px rgba(0,0,0,0.4);
             color: rgba(255,255,255,0.1); font-size: 24px; font-weight: 900;
-            will-change: transform; /* Hint for touch responsiveness */
+            will-change: transform; 
         }
         .btn-round.pressed {
             transform: translateY(3px) !important; 
@@ -547,8 +552,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-        // --- PWA ASSET INJECTION REMOVED FROM HERE (Now in HEAD) ---
 
         // --- ENVIRONMENT SETUP ---
         const inCanvasEnvironment = typeof __firebase_config !== 'undefined';
