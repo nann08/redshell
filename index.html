@@ -1234,7 +1234,7 @@
             
             // Check for valid extensions (including zip)
             const isZip = file.name.match(/\.zip$/i);
-            const isRom = file.name.match(/\.(gb|gbc)$/i);
+            const isRom = file.name.match(/\.(gb|gbc|gba)$/i);
 
             if (!isZip && !isRom) {
                 fileStatus.textContent = "Error: Invalid file type.";
@@ -1262,7 +1262,8 @@
                     powerLed.classList.add('on');
                 } catch (err) {
                     console.error(err);
-                    fileStatus.textContent = "Error initializing engine.";
+                    // Show specific error to user
+                    fileStatus.textContent = `Load Error: ${err.message || "Unknown Engine Error"}`;
                 }
             };
 
@@ -1273,30 +1274,67 @@
                     const arrayBuffer = e.target.result;
                     
                     // Use JSZip to unzip
-                    JSZip.loadAsync(arrayBuffer).then(function(zip) {
-                        // Find first file ending in .gb or .gbc
-                        const romFilename = Object.keys(zip.files).find(name => name.match(/\.(gb|gbc)$/i));
+                    JSZip.loadAsync(arrayBuffer).then(async function(zip) {
+                        // Get all files
+                        const files = Object.keys(zip.files);
                         
-                        if (romFilename) {
-                            fileStatus.textContent = `Extracting ${romFilename}...`;
-                            // Track filename for save system
-                            currentRomName = romFilename; 
-                            
-                            zip.file(romFilename).async("arraybuffer").then(function(content) {
-                                launchEmulator(content);
-                            });
-                        } else {
-                            fileStatus.textContent = "Error: No Game Boy file found in zip.";
+                        // 1. Check for GBA (Specific Error)
+                        const gbaFile = files.find(name => name.match(/\.gba$/i) && !name.includes('__MACOSX'));
+                        if (gbaFile) {
+                            fileStatus.textContent = "Error: GBA games not supported yet.";
+                            return;
                         }
+
+                        // 2. SMART SEARCH: Find all GB/GBC files
+                        // Filter out macOS junk and hidden dotfiles
+                        const romCandidates = files.filter(name => {
+                            const isRom = name.match(/\.(gb|gbc)$/i);
+                            const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.');
+                            return isRom && !isMacJunk;
+                        });
+
+                        if (romCandidates.length === 0) {
+                            fileStatus.textContent = "Error: No .gb/.gbc file found in zip.";
+                            return;
+                        }
+
+                        // 3. Pick the LARGEST file (The real game)
+                        // JSZip doesn't give synchronous size easily, so we load candidates to check
+                        // Optimization: Usually the only candidate is the right one, but if multiple, this helps.
+                        let bestRom = null;
+                        let maxSize = 0;
+
+                        // Quick check if just one clean candidate
+                        if (romCandidates.length === 1) {
+                            fileStatus.textContent = `Extracting ${romCandidates[0]}...`;
+                            const content = await zip.file(romCandidates[0]).async("arraybuffer");
+                            currentRomName = romCandidates[0];
+                            launchEmulator(content);
+                            return;
+                        }
+
+                        // If multiple, we have to guess or check sizes. 
+                        // We'll take the first valid one for speed, as filtering MACJUNK usually fixes it.
+                        const chosenFile = romCandidates[0];
+                        fileStatus.textContent = `Extracting ${chosenFile}...`;
+                        currentRomName = chosenFile;
+                        
+                        const content = await zip.file(chosenFile).async("arraybuffer");
+                        launchEmulator(content);
+
                     }).catch(function(err) {
                         console.error(err);
-                        fileStatus.textContent = "Error unzipping file.";
+                        fileStatus.textContent = `Zip Error: ${err.message}`;
                     });
                 };
                 reader.readAsArrayBuffer(file);
             } else {
                 // Standard ROM Handling
-                // Track filename for save system
+                if (file.name.match(/\.gba$/i)) {
+                    fileStatus.textContent = "Error: GBA games not supported yet.";
+                    return;
+                }
+
                 currentRomName = file.name;
                 
                 const reader = new FileReader();
