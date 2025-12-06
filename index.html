@@ -502,8 +502,8 @@
                         <h2 class="text-xl font-bold mb-6 text-gray-800 tracking-wider">MENU</h2>
                         <div class="menu-btn" id="btn-menu-load">LOAD ROM</div>
                         <div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div>
-                        <div class="menu-btn" id="btn-menu-controls" style="margin-top:20px;">CONTROLS</div>
-                        <button id="btn-close-main-menu" class="mt-6 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Resume</button>
+                        <!-- Controls button removed as requested -->
+                        <button id="btn-close-main-menu" class="mt-6 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Cancel</button>
                     </div>
 
                     <!-- NEW: Styles Menu -->
@@ -1042,7 +1042,7 @@
             document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus);
             document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
             document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu'));
-            document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu'));
+            // Controls listener removed from here (Start button handles it)
 
             // Styles Menu
             document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
