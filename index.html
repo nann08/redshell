@@ -12,11 +12,14 @@
     
     <title>Nann Emulator</title>
 
+    <!-- EMULATOR ENGINE: WasmBoy (GB/GBC Support) -->
+    <script src="https://cdn.jsdelivr.net/npm/wasmboy@0.6.0/dist/wasmboy.min.js"></script>
+
     <!-- PWA Setup Script -->
     <script>
         (function() {
             // RESTORED: The original icon string
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -69,7 +72,7 @@
         }
 
         :root {
-            --screen-color: #ffffff; /* White Screen */
+            --screen-color: #ffffff;
             --screen-shadow: #0f380f;
             --safe-top: env(safe-area-inset-top, 20px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
@@ -212,7 +215,8 @@
                     transparent 2px
                 );
             pointer-events: none;
-            z-index: 5;
+            /* UPDATED: Raised Z-Index to 200 so it overlays menus (z-index 100) as well */
+            z-index: 200;
             will-change: transform;
         }
         
@@ -224,7 +228,7 @@
             background-color: transparent; 
             display: none; 
             will-change: transform; 
-            image-rendering: pixelated; /* Essential for ROMs */
+            image-rendering: pixelated; 
         }
         
         /* Menus */
@@ -256,7 +260,6 @@
             color: #000000;
         }
 
-        /* Nintendo-style Logo */
         .nann-pill {
             border: 3px solid #000000;
             border-radius: 50px;
@@ -275,34 +278,16 @@
             line-height: 1;
         }
 
-        .insert-cart-btn {
-            background: #0f380f;
-            color: #9bbc0f;
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-weight: bold;
-            border: 2px solid #0f380f;
-            cursor: pointer;
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
         /* Menu Button Styles */
         .menu-btn {
             width: 80%;
-            padding: 8px; /* Reduced padding */
-            margin: 5px 0; /* Reduced margin */
+            padding: 8px;
+            margin: 5px 0;
             background-color: #f3f4f6;
             border: 2px solid #d1d5db;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 14px; /* Slightly smaller text */
+            font-size: 14px;
             color: #374151;
             text-align: center;
             cursor: pointer;
@@ -351,7 +336,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         .upload-label.rom-label {
-            background-color: #2563eb; /* Blue for ROMs */
+            background-color: #2563eb;
         }
         .upload-label:hover { opacity: 0.9; }
 
@@ -579,7 +564,7 @@
                             LOAD HTML (WEB)
                         </label>
                         
-                        <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba">
+                        <input type="file" id="file-input-rom" accept=".gb,.gbc">
                         <label for="file-input-rom" class="upload-label rom-label">
                             LOAD ROM (.GB)
                         </label>
@@ -643,6 +628,7 @@
         let auth;
         let userId = null;
         let gameMode = 'html'; // 'html' or 'rom'
+        let wasmBoyInitialized = false;
 
         let keyMap = {
             'Up': { key: 'w', code: 'KeyW', keyCode: 87 },
@@ -827,13 +813,11 @@
         
         function handleVirtualPress(label, isDown, shouldSendMessage = true) {
             const currentState = virtualKeyStates[label] || false;
-            if (isDown && !currentState) {
-                virtualKeyStates[label] = true;
-                if (shouldSendMessage) sendKey(label, true);
-            } 
-            else if (!isDown && currentState) {
-                virtualKeyStates[label] = false;
-                if (shouldSendMessage) sendKey(label, false);
+            
+            // Only update if state actually changed
+            if (isDown !== currentState) {
+                virtualKeyStates[label] = isDown;
+                if (shouldSendMessage) sendKey(label, isDown);
             }
         }
 
@@ -853,9 +837,33 @@
                     keyCode: mappedKey.keyCode
                 }, '*');
             } else if (gameMode === 'rom') {
-                // ROM Mode: Interact with Emulator Engine (Future integration)
-                // console.log(`Emulator Input: ${label} ${isDown ? 'DOWN' : 'UP'}`);
-                // TODO: Hook into window.GameBoyInstance.keyPress(...)
+                // ROM Mode: Interact with WasmBoy Engine
+                // WasmBoy expects a state object for polling or update
+                // We update the state internally and let the engine poll or push
+                
+                if (window.WasmBoy) {
+                    // Map our labels to WasmBoy keys
+                    // WasmBoy keys: UP, DOWN, LEFT, RIGHT, A, B, SELECT, START
+                    const wbKey = label.toUpperCase();
+                    
+                    // Create a promise to update state (WasmBoy is async/state based)
+                    // Efficiently just update the internal state object if accessible, 
+                    // or use the API if needed. WasmBoy usually needs `setJoypadState`
+                    
+                    // Construct state object based on our virtualKeyStates
+                    const wbState = {
+                        UP: virtualKeyStates['Up'] || false,
+                        DOWN: virtualKeyStates['Down'] || false,
+                        LEFT: virtualKeyStates['Left'] || false,
+                        RIGHT: virtualKeyStates['Right'] || false,
+                        A: virtualKeyStates['A'] || false,
+                        B: virtualKeyStates['B'] || false,
+                        SELECT: virtualKeyStates['Select'] || false,
+                        START: virtualKeyStates['Start'] || false
+                    };
+                    
+                    WasmBoy.setJoypadState(wbState);
+                }
             }
         }
 
@@ -874,21 +882,16 @@
             const keypad = document.getElementById('virtual-keypad');
             keypad.innerHTML = ''; 
             
-            // EXPANDED: Full Keypad for Mobile Users
             const keys = [
-                // Numbers
                 {k:'1',c:'Digit1',d:'1'},{k:'2',c:'Digit2',d:'2'},{k:'3',c:'Digit3',d:'3'},{k:'4',c:'Digit4',d:'4'},{k:'5',c:'Digit5',d:'5'},
                 {k:'6',c:'Digit6',d:'6'},{k:'7',c:'Digit7',d:'7'},{k:'8',c:'Digit8',d:'8'},{k:'9',c:'Digit9',d:'9'},{k:'0',c:'Digit0',d:'0'},
-                // QWERTY
                 {k:'q',c:'KeyQ',d:'Q'},{k:'w',c:'KeyW',d:'W'},{k:'e',c:'KeyE',d:'E'},{k:'r',c:'KeyR',d:'R'},{k:'t',c:'KeyT',d:'T'},
                 {k:'y',c:'KeyY',d:'Y'},{k:'u',c:'KeyU',d:'U'},{k:'i',c:'KeyI',d:'I'},{k:'o',c:'KeyO',d:'O'},{k:'p',c:'KeyP',d:'P'},
                 {k:'a',c:'KeyA',d:'A'},{k:'s',c:'KeyS',d:'S'},{k:'d',c:'KeyD',d:'D'},{k:'f',c:'KeyF',d:'F'},{k:'g',c:'KeyG',d:'G'},
                 {k:'h',c:'KeyH',d:'H'},{k:'j',c:'KeyJ',d:'J'},{k:'k',c:'KeyK',d:'K'},{k:'l',c:'KeyL',d:'L'},
                 {k:'z',c:'KeyZ',d:'Z'},{k:'x',c:'KeyX',d:'X'},{k:'c',c:'KeyC',d:'C'},{k:'v',c:'KeyV',d:'V'},{k:'b',c:'KeyB',d:'B'},
                 {k:'n',c:'KeyN',d:'N'},{k:'m',c:'KeyM',d:'M'},
-                // Special
                 {k:' ',c:'Space',d:'SPACE',kc:32},{k:'Enter',c:'Enter',d:'ENTER',kc:13},{k:'Shift',c:'ShiftLeft',d:'SHIFT'},{k:'Control',c:'ControlLeft',d:'CTRL'},
-                // Arrows
                 {k:'ArrowUp',c:'ArrowUp',d:'↑'},{k:'ArrowDown',c:'ArrowDown',d:'↓'},
                 {k:'ArrowLeft',c:'ArrowLeft',d:'←'},{k:'ArrowRight',c:'ArrowRight',d:'→'}
             ];
@@ -931,7 +934,6 @@
                 menu.style.display = 'flex';
                 currentMenu = menuId;
                 
-                // FIX: Ensure bindings render every time controls are opened
                 if (menuId === 'key-binding-menu') {
                     renderBindings();
                 }
@@ -965,9 +967,11 @@
             const startScreen = document.getElementById('start-screen');
 
             powerLed.classList.remove('on'); 
+            
+            // Pause any running ROM
+            if (window.WasmBoy && WasmBoy.isPlaying()) WasmBoy.pause();
 
             if (!file) return;
-            // Basic validation
             if (file.type !== 'text/html' && !file.name.endsWith('.html')) { 
                 fileStatus.textContent = "Error: Invalid HTML file."; 
                 return; 
@@ -992,7 +996,6 @@
                          closeAllMenus();
                          iframe.onload = null;
                          
-                         // Switch to HTML Mode
                          gameMode = 'html';
                          iframe.style.display = 'block';
                          romCanvas.style.display = 'none';
@@ -1009,6 +1012,32 @@
             reader.readAsText(file);
         }
 
+        async function initWasmBoy() {
+            if (wasmBoyInitialized) return;
+            
+            const romCanvas = document.getElementById('rom-canvas');
+            
+            // Configure WasmBoy
+            const WasmBoyLib = window.WasmBoy;
+            await WasmBoyLib.config({
+                headless: false,
+                useGbcWhenOptional: true,
+                isAudioEnabled: true,
+                frameSkip: 1,
+                audioBatchProcessing: true,
+                timersBatchProcessing: false,
+                audioAccumulateSamples: 5000,
+                graphicsBatchProcessing: false,
+                tileBatchProcessing: true,
+                backgroundBatchProcessing: true,
+                spriteBatchProcessing: true,
+                canvas: romCanvas, // Render to our existing canvas
+                wasmPath: 'https://cdn.jsdelivr.net/npm/wasmboy@0.6.0/dist/wasmboy.wasm'
+            });
+            
+            wasmBoyInitialized = true;
+        }
+
         function handleRomUpload(event) {
             const file = event.target.files[0];
             const fileStatus = document.getElementById('file-status');
@@ -1020,38 +1049,37 @@
             powerLed.classList.remove('on');
 
             if (!file) return;
-            // Basic Extension Check
-            if (!file.name.match(/\.(gb|gbc|gba)$/i)) {
+            if (!file.name.match(/\.(gb|gbc)$/i)) {
                 fileStatus.textContent = "Error: Invalid ROM file.";
                 return;
             }
 
             fileStatus.textContent = `Reading ${file.name}...`;
+            
+            // Using ArrayBuffer for WasmBoy
             const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const romData = e.target.result; // ArrayBuffer
+            reader.onload = async function(e) {
+                const romData = e.target.result; 
                 
-                // Switch to ROM Mode
-                gameMode = 'rom';
-                closeAllMenus();
-                
-                startScreen.style.display = 'none';
-                iframe.style.display = 'none';
-                romCanvas.style.display = 'block';
-                
-                // --- EMULATOR HOOK POINT ---
-                // Here we would pass `romData` to the emulator library.
-                // For now, we simulate a successful load:
-                const ctx = romCanvas.getContext('2d');
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0,0,romCanvas.width, romCanvas.height);
-                ctx.fillStyle = '#9bbc0f';
-                ctx.font = '20px monospace';
-                ctx.fillText("ROM ENGINE READY", 50, 70);
-                ctx.fillText("Insert Core Lib", 60, 100);
-                
-                powerLed.classList.add('on');
+                try {
+                    await initWasmBoy();
+                    
+                    // Switch to ROM Mode
+                    gameMode = 'rom';
+                    closeAllMenus();
+                    
+                    startScreen.style.display = 'none';
+                    iframe.style.display = 'none';
+                    romCanvas.style.display = 'block';
+                    
+                    await WasmBoy.loadROM(romData);
+                    await WasmBoy.play();
+                    
+                    powerLed.classList.add('on');
+                } catch (err) {
+                    console.error(err);
+                    fileStatus.textContent = "Error initializing engine.";
+                }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -1068,8 +1096,9 @@
                 const control = e.currentTarget;
                 const label = control.getAttribute('data-label');
 
-                // UNLOCKED: Removed the guard clause that blocked inputs when menu was open.
-                // Buttons will now animate and make sound at all times.
+                if (currentMenu !== null && label !== 'Start' && label !== 'Select') {
+                    return;
+                }
                 
                 initAudio();
                 playHapticSound();
@@ -1089,14 +1118,10 @@
                 const control = e.currentTarget;
                 const label = control.getAttribute('data-label');
                 
-                // UNLOCKED: Removed guard clause here too.
-                // This ensures visual "lift" animation always plays, so buttons don't stick.
-                
                 handleVirtualPress(label, false, true); 
                 handleVisualPress(control, false);
                 updateDpadVisuals(label, false);
                 
-                // Only run Menu Toggle logic if the specific button was tapped
                 if (['Select', 'Start'].includes(label) && control.isTap) {
                     const duration = Date.now() - (control.pressTime || 0);
                     if (duration < TAP_THRESHOLD_MS) {
@@ -1115,29 +1140,22 @@
                 control.addEventListener('mouseleave', handleEnd);
             });
             
-            // KEY MAP PAGE RESTORED LOGIC:
-            // "Close" button now fully closes the menu and returns to game (no navigation to main menu)
+            // Menu Bindings
             document.getElementById('btn-close-key-map')?.addEventListener('click', closeAllMenus);
             
-            // Upload Menu
             document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
-            // Separate handlers for HTML and ROM
             document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
             document.getElementById('file-input-rom')?.addEventListener('change', handleRomUpload);
             
-            // Keypad
             document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection);
             document.getElementById('close-install')?.addEventListener('click', () => {
                 document.getElementById('install-prompt').style.display = 'none';
             });
 
-            // Main Menu Buttons
             document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus);
             document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
             document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu'));
-            // Controls listener removed from here (Start button handles it)
 
-            // Styles Menu
             document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
             document.querySelectorAll('.theme-option').forEach(option => {
                 option.addEventListener('click', () => {
