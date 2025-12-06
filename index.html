@@ -12,8 +12,8 @@
     
     <title>Nann Emulator</title>
 
-    <!-- EMULATOR ENGINE: WasmBoy (GB/GBC Support) -->
-    <script src="https://cdn.jsdelivr.net/npm/wasmboy@0.6.0/dist/wasmboy.min.js"></script>
+    <!-- EMULATOR ENGINE: WasmBoy (Switched to unpkg for better reliability) -->
+    <script src="https://unpkg.com/wasmboy@0.6.0/dist/wasmboy.min.js"></script>
     
     <!-- UTILITY: JSZip for handling .zip ROMs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1200,12 +1200,13 @@
             
             // 1. Check if library is loaded
             if (!window.WasmBoy) {
-                // Rescue: Try to inject the script dynamically if it's missing
+                // Rescue: Try to inject the script from UNPKG if missing
                 await new Promise((resolve, reject) => {
                     const script = document.createElement('script');
-                    script.src = 'https://cdn.jsdelivr.net/npm/wasmboy@0.6.0/dist/wasmboy.min.js';
+                    // Switched to unpkg
+                    script.src = 'https://unpkg.com/wasmboy@0.6.0/dist/wasmboy.min.js';
                     script.onload = resolve;
-                    script.onerror = () => reject(new Error("Could not download Emulator Core. Check Internet."));
+                    script.onerror = () => reject(new Error("Could not download Emulator Core. Check Internet Connection."));
                     document.head.appendChild(script);
                 });
             }
@@ -1232,7 +1233,8 @@
                 backgroundBatchProcessing: true,
                 spriteBatchProcessing: true,
                 canvas: romCanvas, 
-                wasmPath: 'https://cdn.jsdelivr.net/npm/wasmboy@0.6.0/dist/wasmboy.wasm'
+                // CRITICAL FIX: Ensure the WASM binary is also fetched from the reliable source
+                wasmPath: 'https://unpkg.com/wasmboy@0.6.0/dist/wasmboy.wasm'
             });
             
             wasmBoyInitialized = true;
