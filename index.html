@@ -12,9 +12,6 @@
     
     <title>Nann Emulator</title>
 
-    <!-- EMULATOR ENGINE: WasmBoy (Switched to unpkg for better reliability) -->
-    <script src="https://unpkg.com/wasmboy@0.6.0/dist/wasmboy.min.js"></script>
-    
     <!-- UTILITY: JSZip for handling .zip ROMs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -22,7 +19,7 @@
     <script>
         (function() {
             // RESTORED: The original icon string
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -218,7 +215,6 @@
                     transparent 2px
                 );
             pointer-events: none;
-            /* UPDATED: Raised Z-Index to 200 so it overlays menus (z-index 100) as well */
             z-index: 200;
             will-change: transform;
         }
@@ -242,7 +238,7 @@
             width: 100%;
             height: 100%;
             background-color: white; 
-            padding: 12px; /* Reduced padding for better fit */
+            padding: 12px; 
             display: none;
             flex-direction: column;
             align-items: center;
@@ -283,14 +279,14 @@
 
         /* Menu Button Styles */
         .menu-btn {
-            width: 90%; /* Wider buttons */
-            padding: 8px 0; /* Vertical padding */
-            margin: 4px 0; /* Tighter spacing */
+            width: 90%; 
+            padding: 8px 0;
+            margin: 4px 0; 
             background-color: #f3f4f6;
             border: 2px solid #d1d5db;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 13px; /* Optimized font size */
+            font-size: 13px;
             color: #374151;
             text-align: center;
             cursor: pointer;
@@ -306,14 +302,14 @@
             display: flex;
             align-items: center;
             width: 100%;
-            padding: 8px; /* Reduced padding */
+            padding: 8px; 
             margin: 4px 0;
             border: 1px solid #eee;
             border-radius: 8px;
             cursor: pointer;
         }
         .theme-preview {
-            width: 24px; /* Slightly smaller bubbles */
+            width: 24px; 
             height: 24px;
             border-radius: 50%;
             margin-right: 15px;
@@ -327,7 +323,7 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 10px; /* Reduced padding */
+            padding: 10px; 
             background-color: #dc2626; 
             color: white;
             border-radius: 8px;
@@ -337,48 +333,6 @@
             margin-bottom: 8px;
             transition: background-color 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .menu-btn:active {
-            background-color: #e5e7eb;
-            transform: scale(0.98);
-        }
-        
-        /* Theme Bubbles */
-        .theme-option {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .theme-preview {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin-right: 15px;
-            border: 2px solid rgba(0,0,0,0.1);
-        }
-
-        #file-input-html, #file-input-rom { display: none; }
-
-        .upload-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 8px; /* Reduced from 12px for compact fit */
-            background-color: #dc2626; 
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px; /* Slightly smaller font */
-            margin-bottom: 8px; /* Tighter spacing */
-            transition: background-color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
         }
         .upload-label.rom-label {
             background-color: #2563eb;
@@ -423,7 +377,6 @@
         .dpad-arm {
             background-color: #1c1c1c; 
             position: absolute; border-radius: 6px;
-            /* UPDATED SHADOW: Removed the harsh inset that caused the seam */
             box-shadow: 2px 4px 6px rgba(0,0,0,0.4); 
             transition: transform 0.05s; 
             will-change: transform;
@@ -432,7 +385,6 @@
             backface-visibility: hidden;
         }
         
-        /* Add inner highlight via pseudo-element to avoid center overlap issues */
         .dpad-arm::before {
             content: '';
             position: absolute;
@@ -444,39 +396,33 @@
 
         .dpad-arm.pressed-arm {
             transform: translateY(2px) translate3d(0,0,0) !important;
-            /* Updated pressed shadow */
             box-shadow: 0 1px 2px rgba(0,0,0,0.4); 
         }
         .dpad-h { width: 130px; height: 40px; top: 45px; left: 0; }
         .dpad-v { width: 40px; height: 130px; left: 45px; top: 0; }
         
-        /* UPDATED CENTER: Perfectly Flushed */
         .dpad-center {
             position: absolute; 
-            width: 40px; /* Reduced from 42px to match arm width exactly */
+            width: 40px; 
             height: 40px; 
             background-color: #1c1c1c; 
-            top: 45px; /* Aligned perfectly with arms */
+            top: 45px; 
             left: 45px; 
             z-index: 15;
-            /* Tighter radius to blend into the cross shape */
             border-radius: 4px; 
             background: radial-gradient(circle at center, #1c1c1c 60%, #1c1c1c 100%);
         }
         
-        /* The Thumb Dimple */
         .dpad-center::after {
             content: ''; 
             position: absolute; 
             top: 6px; left: 6px; 
             width: 28px; height: 28px; 
             border-radius: 50%; 
-            /* Subtle concave effect */
             background: radial-gradient(circle, #151515 0%, #1c1c1c 70%);
             box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 0 rgba(255,255,255,0.1);
         }
         
-        /* Increased Hit Area for D-Pad */
         .dpad-btn { 
             position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer;
             will-change: transform; 
@@ -591,7 +537,7 @@
                     <iframe id="game-iframe" src="about:blank" allow="keyboard; game" referrerpolicy="no-referrer"></iframe>
                     <canvas id="rom-canvas"></canvas>
                     
-                    <!-- NEW: Main Select Menu (Includes Controls now) -->
+                    <!-- NEW: Main Select Menu -->
                     <div id="main-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2>
                         <div class="menu-btn" id="btn-menu-load">LOAD GAME</div>
@@ -632,7 +578,7 @@
                     <div id="key-binding-menu" class="menu-ui">
                         <h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2>
                         <div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div>
-                        <button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Back</button>
+                        <button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button>
                     </div>
 
                     <!-- Virtual Keypad -->
@@ -643,8 +589,8 @@
                     </div>
 
                     <!-- NEW: Dual Load Menu -->
-                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"> <!-- Reduced container padding -->
-                        <h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2> <!-- Reduced margin -->
+                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"> 
+                        <h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2> 
                         
                         <input type="file" id="file-input-html" accept=".html,text/html">
                         <label for="file-input-html" class="upload-label">
@@ -719,9 +665,9 @@
 
         let auth;
         let userId = null;
-        let gameMode = 'html'; // 'html' or 'rom'
+        let gameMode = 'html'; 
         let wasmBoyInitialized = false;
-        let currentRomName = 'unknown_game'; // To track saves
+        let currentRomName = 'unknown_game'; 
 
         let keyMap = {
             'Up': { key: 'w', code: 'KeyW', keyCode: 87 },
@@ -772,18 +718,15 @@
         // --- THEME ENGINE ---
         function applyTheme(themeName) {
             const root = document.documentElement;
-            // Defaults (Red)
             let mainColor = '#E83942';
             let darkColor = '#b91c1c';
             let bgColor = '#7f1d1d';
 
             if (themeName === 'purple') {
-                // Atomic Purple
                 mainColor = '#7c3aed';
                 darkColor = '#4c1d95';
                 bgColor = '#4c1d95';
             } else if (themeName === 'glacier') {
-                // Glacier Blue
                 mainColor = '#a5f3fc';
                 darkColor = '#0891b2';
                 bgColor = '#164e63';
@@ -801,8 +744,7 @@
             if (savedTheme) applyTheme(savedTheme);
         }
 
-        // --- DATABASE (INDEXED DB) FOR SAVES ---
-        // Simple wrapper to handle saving binary data locally
+        // --- DATABASE FOR SAVES ---
         const DB_NAME = 'NannBoySaves';
         const DB_VERSION = 1;
         const STORE_NAME = 'save_states';
@@ -828,14 +770,12 @@
             }
 
             try {
-                // Get state from emulator
                 const state = await WasmBoy.saveState();
                 
                 const db = await openDB();
                 const tx = db.transaction(STORE_NAME, 'readwrite');
                 const store = tx.objectStore(STORE_NAME);
                 
-                // Save using the current ROM name as the key
                 await new Promise((resolve, reject) => {
                     const req = store.put(state, currentRomName);
                     req.onsuccess = resolve;
@@ -892,7 +832,7 @@
         // --- LOGIC ---
 
         async function initFirebase() {
-            loadTheme(); // Load theme immediately
+            loadTheme(); 
             const loadingOverlay = document.getElementById('loading-overlay');
             
             if (!inCanvasEnvironment || !firebaseConfig || Object.keys(firebaseConfig).length === 0) {
@@ -995,7 +935,6 @@
         function handleVirtualPress(label, isDown, shouldSendMessage = true) {
             const currentState = virtualKeyStates[label] || false;
             
-            // Only update if state actually changed
             if (isDown !== currentState) {
                 virtualKeyStates[label] = isDown;
                 if (shouldSendMessage) sendKey(label, isDown);
@@ -1003,9 +942,7 @@
         }
 
         function sendKey(label, isDown) {
-            // ROUTING LOGIC: Determine where to send input
             if (gameMode === 'html') {
-                // HTML Mode: Post message to iframe
                 const iframe = document.getElementById('game-iframe');
                 if (!iframe || !iframe.contentWindow || currentMenu !== null) return;
                 const mappedKey = keyMap[label];
@@ -1018,20 +955,7 @@
                     keyCode: mappedKey.keyCode
                 }, '*');
             } else if (gameMode === 'rom') {
-                // ROM Mode: Interact with WasmBoy Engine
-                // WasmBoy expects a state object for polling or update
-                // We update the state internally and let the engine poll or push
-                
                 if (window.WasmBoy) {
-                    // Map our labels to WasmBoy keys
-                    // WasmBoy keys: UP, DOWN, LEFT, RIGHT, A, B, SELECT, START
-                    const wbKey = label.toUpperCase();
-                    
-                    // Create a promise to update state (WasmBoy is async/state based)
-                    // Efficiently just update the internal state object if accessible, 
-                    // or use the API if needed. WasmBoy usually needs `setJoypadState`
-                    
-                    // Construct state object based on our virtualKeyStates
                     const wbState = {
                         UP: virtualKeyStates['Up'] || false,
                         DOWN: virtualKeyStates['Down'] || false,
@@ -1103,7 +1027,6 @@
 
         // Generic Menu Opener
         function openMenu(menuId) {
-            // Close any existing open menu
             document.querySelectorAll('.menu-ui').forEach(el => {
                 if (el.id !== 'game-iframe' && el.id !== 'start-screen' && el.id !== 'rom-canvas') {
                     el.style.display = 'none';
@@ -1115,7 +1038,6 @@
                 menu.style.display = 'flex';
                 currentMenu = menuId;
                 
-                // FIX: Ensure bindings render every time controls are opened
                 if (menuId === 'key-binding-menu') {
                     renderBindings();
                 }
@@ -1131,7 +1053,6 @@
             currentMenu = null;
         }
 
-        // FIXED: Universal Toggle Logic
         function toggleMenu(menuId) {
             if (currentMenu === menuId) {
                 closeAllMenus();
@@ -1150,7 +1071,6 @@
 
             powerLed.classList.remove('on'); 
             
-            // Pause any running ROM
             if (window.WasmBoy && WasmBoy.isPlaying()) WasmBoy.pause();
 
             if (!file) return;
@@ -1203,7 +1123,7 @@
                 // Rescue: Try to inject the script from UNPKG if missing
                 await new Promise((resolve, reject) => {
                     const script = document.createElement('script');
-                    // Switched to unpkg
+                    // Switched to unpkg for better reliability
                     script.src = 'https://unpkg.com/wasmboy@0.6.0/dist/wasmboy.min.js';
                     script.onload = resolve;
                     script.onerror = () => reject(new Error("Could not download Emulator Core. Check Internet Connection."));
@@ -1252,7 +1172,6 @@
 
             if (!file) return;
             
-            // Check for valid extensions (including zip)
             const isZip = file.name.match(/\.zip$/i);
             const isRom = file.name.match(/\.(gb|gbc|gba)$/i);
 
@@ -1263,12 +1182,10 @@
 
             fileStatus.textContent = `Reading ${file.name}...`;
             
-            // Common function to launch the emulator with raw ROM data
             const launchEmulator = async (romData) => {
                 try {
                     await initWasmBoy();
                     
-                    // Switch to ROM Mode
                     gameMode = 'rom';
                     closeAllMenus();
                     
@@ -1282,31 +1199,24 @@
                     powerLed.classList.add('on');
                 } catch (err) {
                     console.error(err);
-                    // Show specific error to user
                     fileStatus.textContent = `Load Error: ${err.message || "Unknown Engine Error"}`;
                 }
             };
 
             if (isZip) {
-                // ZIP Handling
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const arrayBuffer = e.target.result;
                     
-                    // Use JSZip to unzip
                     JSZip.loadAsync(arrayBuffer).then(async function(zip) {
-                        // Get all files
                         const files = Object.keys(zip.files);
                         
-                        // 1. Check for GBA (Specific Error)
                         const gbaFile = files.find(name => name.match(/\.gba$/i) && !name.includes('__MACOSX'));
                         if (gbaFile) {
                             fileStatus.textContent = "Error: GBA games not supported yet.";
                             return;
                         }
 
-                        // 2. SMART SEARCH: Find all GB/GBC files
-                        // Filter out macOS junk and hidden dotfiles
                         const romCandidates = files.filter(name => {
                             const isRom = name.match(/\.(gb|gbc)$/i);
                             const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.');
@@ -1318,13 +1228,9 @@
                             return;
                         }
 
-                        // 3. Pick the LARGEST file (The real game)
-                        // JSZip doesn't give synchronous size easily, so we load candidates to check
-                        // Optimization: Usually the only candidate is the right one, but if multiple, this helps.
                         let bestRom = null;
                         let maxSize = 0;
 
-                        // Quick check if just one clean candidate
                         if (romCandidates.length === 1) {
                             fileStatus.textContent = `Extracting ${romCandidates[0]}...`;
                             const content = await zip.file(romCandidates[0]).async("arraybuffer");
@@ -1333,8 +1239,6 @@
                             return;
                         }
 
-                        // If multiple, we have to guess or check sizes. 
-                        // We'll take the first valid one for speed, as filtering MACJUNK usually fixes it.
                         const chosenFile = romCandidates[0];
                         fileStatus.textContent = `Extracting ${chosenFile}...`;
                         currentRomName = chosenFile;
@@ -1349,7 +1253,6 @@
                 };
                 reader.readAsArrayBuffer(file);
             } else {
-                // Standard ROM Handling
                 if (file.name.match(/\.gba$/i)) {
                     fileStatus.textContent = "Error: GBA games not supported yet.";
                     return;
@@ -1399,18 +1302,13 @@
                 const control = e.currentTarget;
                 const label = control.getAttribute('data-label');
                 
-                // UNLOCKED: Removed guard clause here too.
-                // This ensures visual "lift" animation always plays, so buttons don't stick.
-                
                 handleVirtualPress(label, false, true); 
                 handleVisualPress(control, false);
                 updateDpadVisuals(label, false);
                 
-                // Only run Menu Toggle logic if the specific button was tapped
                 if (['Select', 'Start'].includes(label) && control.isTap) {
                     const duration = Date.now() - (control.pressTime || 0);
                     if (duration < TAP_THRESHOLD_MS) {
-                        // UPDATED LOGIC: Select -> Main Menu, Start -> Start (Save/Load) Menu
                         if (label === 'Select') toggleMenu('main-menu'); 
                         else if (label === 'Start') toggleMenu('start-menu'); 
                     }
@@ -1426,35 +1324,26 @@
                 control.addEventListener('mouseleave', handleEnd);
             });
             
-            // Menu Buttons Logic
-            
-            // KEY MAP PAGE LOGIC:
-            // "Back" button returns to Main Menu (since it's a submenu of Select now)
             document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu'));
             
-            // Upload Menu
             document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
             document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
             document.getElementById('file-input-rom')?.addEventListener('change', handleRomUpload);
             
-            // Keypad
             document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection);
             document.getElementById('close-install')?.addEventListener('click', () => {
                 document.getElementById('install-prompt').style.display = 'none';
             });
 
-            // Main Menu Buttons
             document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus);
             document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
             document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu'));
-            document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); // Wired up Controls
+            document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); 
 
-            // Start Menu Buttons (Save/Load)
             document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus);
             document.getElementById('btn-menu-save')?.addEventListener('click', saveStateToDB);
             document.getElementById('btn-menu-load-state')?.addEventListener('click', loadStateFromDB);
 
-            // Styles Menu
             document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
             document.querySelectorAll('.theme-option').forEach(option => {
                 option.addEventListener('click', () => {
