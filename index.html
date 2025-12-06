@@ -95,7 +95,7 @@
             position: fixed;
             overflow: hidden;
             background-color: var(--bg-color); 
-            transition: background-color 0.3s ease; /* Smooth theme transition */
+            transition: background-color 0.3s ease;
         }
 
         body {
@@ -123,7 +123,6 @@
 
         .gbc-body {
             --console-width: 440px; 
-            /* Gradient defined by CSS variables for theming */
             background: linear-gradient(145deg, var(--console-main) 0%, var(--console-dark) 100%);
             width: var(--console-width); 
             border-radius: 20px 20px 60px 20px;
@@ -534,7 +533,7 @@
                     <div id="key-binding-menu" class="menu-ui">
                         <h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2>
                         <div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div>
-                        <button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Back</button>
+                        <button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button>
                     </div>
 
                     <!-- Virtual Keypad -->
@@ -878,6 +877,11 @@
             if (menu) {
                 menu.style.display = 'flex';
                 currentMenu = menuId;
+                
+                // FIX: Ensure bindings render every time controls are opened
+                if (menuId === 'key-binding-menu') {
+                    renderBindings();
+                }
             }
         }
 
@@ -890,12 +894,12 @@
             currentMenu = null;
         }
 
-        // Toggle logic for Select Button
-        function toggleMainMenu() {
-            if (currentMenu === 'main-menu') {
+        // FIXED: Universal Toggle Logic
+        function toggleMenu(menuId) {
+            if (currentMenu === menuId) {
                 closeAllMenus();
             } else {
-                openMenu('main-menu');
+                openMenu(menuId);
             }
         }
         
@@ -953,7 +957,7 @@
 
             const handleStart = (e) => {
                 e.preventDefault(); 
-                if (currentMenu !== null) return; 
+                // ALLOW Start/Select to be pressed even if menu is open
                 
                 initAudio();
                 playHapticSound();
@@ -971,10 +975,15 @@
 
             const handleEnd = (e) => {
                 e.preventDefault();
-                if (currentMenu !== null) return; 
                 
                 const control = e.currentTarget;
                 const label = control.getAttribute('data-label');
+                
+                // FIXED: Guard logic - Block other inputs if menu is open, BUT allow Select/Start
+                if (currentMenu !== null && label !== 'Select' && label !== 'Start') {
+                    return;
+                }
+                
                 handleVirtualPress(label, false, true); 
                 handleVisualPress(control, false);
                 updateDpadVisuals(label, false);
@@ -983,8 +992,9 @@
                 if (['Select', 'Start'].includes(label) && control.isTap) {
                     const duration = Date.now() - (control.pressTime || 0);
                     if (duration < TAP_THRESHOLD_MS) {
-                        if (label === 'Select') toggleMainMenu(); // Changed to Main Menu
-                        else if (label === 'Start') openMenu('key-binding-menu'); 
+                        // RESTORED: Start button toggles Controls, Select toggles Main Menu
+                        if (label === 'Select') toggleMenu('main-menu'); 
+                        else if (label === 'Start') toggleMenu('key-binding-menu'); 
                     }
                 }
                 control.isTap = false;
@@ -1000,7 +1010,10 @@
             
             // Menu Buttons Logic
             document.getElementById('btn-insert-cart').addEventListener('click', () => openMenu('upload-menu'));
-            document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu'));
+            
+            // KEY MAP PAGE RESTORED LOGIC:
+            // "Close" button now fully closes the menu and returns to game (no navigation to main menu)
+            document.getElementById('btn-close-key-map')?.addEventListener('click', closeAllMenus);
             
             // Upload Menu
             document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
