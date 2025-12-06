@@ -14,6 +14,9 @@
 
     <!-- EMULATOR ENGINE: WasmBoy (GB/GBC Support) -->
     <script src="https://cdn.jsdelivr.net/npm/wasmboy@0.6.0/dist/wasmboy.min.js"></script>
+    
+    <!-- UTILITY: JSZip for handling .zip ROMs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <!-- PWA Setup Script -->
     <script>
@@ -239,7 +242,7 @@
             width: 100%;
             height: 100%;
             background-color: white; 
-            padding: 20px; 
+            padding: 12px; /* Reduced padding for better fit */
             display: none;
             flex-direction: column;
             align-items: center;
@@ -280,18 +283,60 @@
 
         /* Menu Button Styles */
         .menu-btn {
-            width: 80%;
-            padding: 8px;
-            margin: 5px 0;
+            width: 90%; /* Wider buttons */
+            padding: 8px 0; /* Vertical padding */
+            margin: 4px 0; /* Tighter spacing */
             background-color: #f3f4f6;
             border: 2px solid #d1d5db;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px; /* Optimized font size */
             color: #374151;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
+        }
+        .menu-btn:active {
+            background-color: #e5e7eb;
+            transform: scale(0.98);
+        }
+        
+        /* Theme Bubbles */
+        .theme-option {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 8px; /* Reduced padding */
+            margin: 4px 0;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .theme-preview {
+            width: 24px; /* Slightly smaller bubbles */
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 2px solid rgba(0,0,0,0.1);
+        }
+
+        #file-input-html, #file-input-rom { display: none; }
+
+        .upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px; /* Reduced padding */
+            background-color: #dc2626; 
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 8px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         .menu-btn:active {
             background-color: #e5e7eb;
@@ -324,16 +369,16 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 12px;
+            padding: 8px; /* Reduced from 12px for compact fit */
             background-color: #dc2626; 
             color: white;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 10px;
+            font-size: 13px; /* Slightly smaller font */
+            margin-bottom: 8px; /* Tighter spacing */
             transition: background-color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
         }
         .upload-label.rom-label {
             background-color: #2563eb;
@@ -378,25 +423,60 @@
         .dpad-arm {
             background-color: #1c1c1c; 
             position: absolute; border-radius: 6px;
-            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.8), 2px 4px 6px rgba(0,0,0,0.4);
-            transition: transform 0.05s, box-shadow 0.05s; 
+            /* UPDATED SHADOW: Removed the harsh inset that caused the seam */
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.4); 
+            transition: transform 0.05s; 
             will-change: transform;
             contain: content;
             transform: translate3d(0,0,0);
             backface-visibility: hidden;
         }
+        
+        /* Add inner highlight via pseudo-element to avoid center overlap issues */
+        .dpad-arm::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 6px;
+            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
         .dpad-arm.pressed-arm {
             transform: translateY(2px) translate3d(0,0,0) !important;
-            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.1), inset -2px -2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.4); 
+            /* Updated pressed shadow */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.4); 
         }
         .dpad-h { width: 130px; height: 40px; top: 45px; left: 0; }
         .dpad-v { width: 40px; height: 130px; left: 45px; top: 0; }
+        
+        /* UPDATED CENTER: Flushed look */
         .dpad-center {
-            position: absolute; width: 40px; height: 40px; background-color: #1c1c1c; top: 45px; left: 45px; z-index: 10;
+            position: absolute; 
+            width: 42px; /* Slightly larger to cover seams */
+            height: 42px; 
+            background-color: #1c1c1c; 
+            top: 44px; /* Centered */
+            left: 44px; 
+            z-index: 15;
+            /* Smooth it out */
+            border-radius: 4px; 
+            /* Remove hard edges with a subtle gradient matching the arms */
+            background: radial-gradient(circle at center, #1c1c1c 60%, #1c1c1c 100%);
         }
+        
+        /* The Thumb Dimple */
         .dpad-center::after {
-            content: ''; position: absolute; top: 5px; left: 5px; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle, #2a2a2a 0%, #1c1c1c 80%);
+            content: ''; 
+            position: absolute; 
+            top: 6px; left: 6px; 
+            width: 28px; height: 28px; 
+            border-radius: 50%; 
+            /* Subtle concave effect */
+            background: radial-gradient(circle, #151515 0%, #1c1c1c 70%);
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 0 rgba(255,255,255,0.1);
         }
+        
         /* Increased Hit Area for D-Pad */
         .dpad-btn { 
             position: absolute; width: 55px; height: 55px; z-index: 20; cursor: pointer;
@@ -512,13 +592,21 @@
                     <iframe id="game-iframe" src="about:blank" allow="keyboard; game" referrerpolicy="no-referrer"></iframe>
                     <canvas id="rom-canvas"></canvas>
                     
-                    <!-- NEW: Main Select Menu -->
+                    <!-- NEW: Main Select Menu (Includes Controls now) -->
                     <div id="main-menu" class="menu-ui">
-                        <h2 class="text-lg font-bold mb-4 text-gray-800 tracking-wider">MENU</h2>
+                        <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">MENU</h2>
                         <div class="menu-btn" id="btn-menu-load">LOAD GAME</div>
+                        <div class="menu-btn" id="btn-menu-controls">CONTROLS</div>
                         <div class="menu-btn" id="btn-menu-style">CHANGE STYLE</div>
-                        <!-- Controls button removed as requested -->
-                        <button id="btn-close-main-menu" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button>
+                        <button id="btn-close-main-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Cancel</button>
+                    </div>
+
+                    <!-- NEW: Start Menu (Save/Load) -->
+                    <div id="start-menu" class="menu-ui">
+                        <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2>
+                        <div class="menu-btn" id="btn-menu-save">SAVE STATE</div>
+                        <div class="menu-btn" id="btn-menu-load-state">LOAD STATE</div>
+                        <button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button>
                     </div>
 
                     <!-- NEW: Styles Menu -->
@@ -545,7 +633,7 @@
                     <div id="key-binding-menu" class="menu-ui">
                         <h2 class="text-xl font-bold mb-4 text-gray-800">Controls</h2>
                         <div id="bindings-list" class="max-h-48 overflow-y-auto w-full flex flex-col items-center"></div>
-                        <button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Close</button>
+                        <button id="btn-close-key-map" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition">Back</button>
                     </div>
 
                     <!-- Virtual Keypad -->
@@ -556,21 +644,26 @@
                     </div>
 
                     <!-- NEW: Dual Load Menu -->
-                    <div id="upload-menu" class="menu-ui">
-                        <h2 class="text-xl font-bold mb-6 text-gray-800">LOAD GAME</h2>
+                    <div id="upload-menu" class="menu-ui" style="padding: 10px;"> <!-- Reduced container padding -->
+                        <h2 class="text-lg font-bold mb-3 text-gray-800">LOAD GAME</h2> <!-- Reduced margin -->
                         
                         <input type="file" id="file-input-html" accept=".html,text/html">
                         <label for="file-input-html" class="upload-label">
                             LOAD HTML (WEB)
                         </label>
                         
-                        <input type="file" id="file-input-rom" accept=".gb,.gbc">
+                        <input type="file" id="file-input-rom" accept=".gb,.gbc,.zip">
                         <label for="file-input-rom" class="upload-label rom-label">
-                            LOAD ROM (.GB)
+                            LOAD ROM (.ZIP/.GB)
                         </label>
                         
-                        <p id="file-status" class="text-xs text-gray-600 mb-8 text-center px-4 mt-2">Supports HTML5 & GB/GBC Roms</p>
-                        <button id="btn-close-upload" class="px-6 py-2 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition">Cancel</button>
+                        <p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports HTML5 & GB/GBC</p>
+                        <button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button>
+                    </div>
+                    
+                    <!-- NEW: Toast Notification for Saves -->
+                    <div id="toast-notification" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full text-xs font-bold opacity-0 transition-opacity duration-300 pointer-events-none" style="z-index: 300;">
+                        GAME SAVED
                     </div>
                     
                 </div>
@@ -629,6 +722,7 @@
         let userId = null;
         let gameMode = 'html'; // 'html' or 'rom'
         let wasmBoyInitialized = false;
+        let currentRomName = 'unknown_game'; // To track saves
 
         let keyMap = {
             'Up': { key: 'w', code: 'KeyW', keyCode: 87 },
@@ -706,6 +800,94 @@
         function loadTheme() {
             const savedTheme = localStorage.getItem(themeStorageKey);
             if (savedTheme) applyTheme(savedTheme);
+        }
+
+        // --- DATABASE (INDEXED DB) FOR SAVES ---
+        // Simple wrapper to handle saving binary data locally
+        const DB_NAME = 'NannBoySaves';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'save_states';
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME);
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function saveStateToDB() {
+            if (gameMode !== 'rom' || !window.WasmBoy || !WasmBoy.isReady()) {
+                showToast("No ROM Running");
+                return;
+            }
+
+            try {
+                // Get state from emulator
+                const state = await WasmBoy.saveState();
+                
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                
+                // Save using the current ROM name as the key
+                await new Promise((resolve, reject) => {
+                    const req = store.put(state, currentRomName);
+                    req.onsuccess = resolve;
+                    req.onerror = reject;
+                });
+                
+                showToast("STATE SAVED!");
+                closeAllMenus();
+            } catch (err) {
+                console.error(err);
+                showToast("Save Failed");
+            }
+        }
+
+        async function loadStateFromDB() {
+            if (gameMode !== 'rom' || !window.WasmBoy || !WasmBoy.isReady()) {
+                showToast("Load ROM First");
+                return;
+            }
+
+            try {
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                
+                const state = await new Promise((resolve, reject) => {
+                    const req = store.get(currentRomName);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = reject;
+                });
+
+                if (state) {
+                    await WasmBoy.loadState(state);
+                    showToast("STATE LOADED!");
+                    closeAllMenus();
+                } else {
+                    showToast("No Save Found");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Load Failed");
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-notification');
+            toast.textContent = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2000);
         }
 
         // --- LOGIC ---
@@ -934,6 +1116,7 @@
                 menu.style.display = 'flex';
                 currentMenu = menuId;
                 
+                // FIX: Ensure bindings render every time controls are opened
                 if (menuId === 'key-binding-menu') {
                     renderBindings();
                 }
@@ -1049,18 +1232,20 @@
             powerLed.classList.remove('on');
 
             if (!file) return;
-            if (!file.name.match(/\.(gb|gbc)$/i)) {
-                fileStatus.textContent = "Error: Invalid ROM file.";
+            
+            // Check for valid extensions (including zip)
+            const isZip = file.name.match(/\.zip$/i);
+            const isRom = file.name.match(/\.(gb|gbc)$/i);
+
+            if (!isZip && !isRom) {
+                fileStatus.textContent = "Error: Invalid file type.";
                 return;
             }
 
             fileStatus.textContent = `Reading ${file.name}...`;
             
-            // Using ArrayBuffer for WasmBoy
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const romData = e.target.result; 
-                
+            // Common function to launch the emulator with raw ROM data
+            const launchEmulator = async (romData) => {
                 try {
                     await initWasmBoy();
                     
@@ -1081,7 +1266,46 @@
                     fileStatus.textContent = "Error initializing engine.";
                 }
             };
-            reader.readAsArrayBuffer(file);
+
+            if (isZip) {
+                // ZIP Handling
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const arrayBuffer = e.target.result;
+                    
+                    // Use JSZip to unzip
+                    JSZip.loadAsync(arrayBuffer).then(function(zip) {
+                        // Find first file ending in .gb or .gbc
+                        const romFilename = Object.keys(zip.files).find(name => name.match(/\.(gb|gbc)$/i));
+                        
+                        if (romFilename) {
+                            fileStatus.textContent = `Extracting ${romFilename}...`;
+                            // Track filename for save system
+                            currentRomName = romFilename; 
+                            
+                            zip.file(romFilename).async("arraybuffer").then(function(content) {
+                                launchEmulator(content);
+                            });
+                        } else {
+                            fileStatus.textContent = "Error: No Game Boy file found in zip.";
+                        }
+                    }).catch(function(err) {
+                        console.error(err);
+                        fileStatus.textContent = "Error unzipping file.";
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                // Standard ROM Handling
+                // Track filename for save system
+                currentRomName = file.name;
+                
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    launchEmulator(e.target.result);
+                };
+                reader.readAsArrayBuffer(file);
+            }
         }
 
         // --- TOUCH & INPUT HANDLING ---
@@ -1118,15 +1342,20 @@
                 const control = e.currentTarget;
                 const label = control.getAttribute('data-label');
                 
+                // UNLOCKED: Removed guard clause here too.
+                // This ensures visual "lift" animation always plays, so buttons don't stick.
+                
                 handleVirtualPress(label, false, true); 
                 handleVisualPress(control, false);
                 updateDpadVisuals(label, false);
                 
+                // Only run Menu Toggle logic if the specific button was tapped
                 if (['Select', 'Start'].includes(label) && control.isTap) {
                     const duration = Date.now() - (control.pressTime || 0);
                     if (duration < TAP_THRESHOLD_MS) {
+                        // UPDATED LOGIC: Select -> Main Menu, Start -> Start (Save/Load) Menu
                         if (label === 'Select') toggleMenu('main-menu'); 
-                        else if (label === 'Start') toggleMenu('key-binding-menu'); 
+                        else if (label === 'Start') toggleMenu('start-menu'); 
                     }
                 }
                 control.isTap = false;
@@ -1140,22 +1369,35 @@
                 control.addEventListener('mouseleave', handleEnd);
             });
             
-            // Menu Bindings
-            document.getElementById('btn-close-key-map')?.addEventListener('click', closeAllMenus);
+            // Menu Buttons Logic
             
+            // KEY MAP PAGE LOGIC:
+            // "Back" button returns to Main Menu (since it's a submenu of Select now)
+            document.getElementById('btn-close-key-map')?.addEventListener('click', () => openMenu('main-menu'));
+            
+            // Upload Menu
             document.getElementById('btn-close-upload')?.addEventListener('click', () => openMenu('main-menu'));
             document.getElementById('file-input-html')?.addEventListener('change', handleHtmlUpload);
             document.getElementById('file-input-rom')?.addEventListener('change', handleRomUpload);
             
+            // Keypad
             document.getElementById('btn-cancel-key-select')?.addEventListener('click', hideKeySelection);
             document.getElementById('close-install')?.addEventListener('click', () => {
                 document.getElementById('install-prompt').style.display = 'none';
             });
 
+            // Main Menu Buttons
             document.getElementById('btn-close-main-menu')?.addEventListener('click', closeAllMenus);
             document.getElementById('btn-menu-load')?.addEventListener('click', () => openMenu('upload-menu'));
             document.getElementById('btn-menu-style')?.addEventListener('click', () => openMenu('styles-menu'));
+            document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); // Wired up Controls
 
+            // Start Menu Buttons (Save/Load)
+            document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus);
+            document.getElementById('btn-menu-save')?.addEventListener('click', saveStateToDB);
+            document.getElementById('btn-menu-load-state')?.addEventListener('click', loadStateFromDB);
+
+            // Styles Menu
             document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
             document.querySelectorAll('.theme-option').forEach(option => {
                 option.addEventListener('click', () => {
