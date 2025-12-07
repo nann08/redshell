@@ -19,7 +19,7 @@
     <script>
         (function() {
             // PWA ICONS
-            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
+            const ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAEg+pWNAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+/Pvo88/gAAAJZSURBVHja7Nw9SstQGIBh8/tD0U1wFO7A3biZtXQPt7C2sLNxB07O4A4cFDqYQJtCUgT1POF7A4EkJ/zk5GFvR0dHR2fW6/V6fXl92Ww2X5fL5buPj4/vbrfb5+Fw+DydTp+m0+nz9XrtE4n7/f4z/X6/X6/X6/vj8fg1xvi62WxeZ7PZ12w2+57NZl+32+334XD4MpvNvnq93rd6vX6YTCbfp9Pp13a7/ZzP51/r9fqx1+t9rdfrh+l0+j2fzz9ns9nPfD7/ms/nP4fD4dtsNvtardbP4/H4Yz6ff0+n08/ZbPaz2Wx+1uv1w2Qy+ZpOp5+z2exns9n8rNfrh8lk8jWdTj9ns9nPZrP5Wa/XD5PJ5Gs6nX7OZrOfzWbzs16vHyaTydf/6fR7Pp9/zGazn/l8/jWfz38Oh8O32Wz2tVqtH4B/wAAAAAABAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAQAAwD8CDAAh9QZ882j32AAAAABJRU5ErkJggg==';
             const iconUrl = `data:image/png;base64,${ICON_BASE64}`;
 
             const linkIcon = document.createElement('link');
@@ -56,7 +56,7 @@
             // PERFORMANCE WARNING SUPPRESSION
             const originalWarn = console.warn;
             console.warn = function(...args) {
-                if (args[0] && typeof args[0] === 'string' && args[0].includes('performance')) return;
+                if (args[0] && typeof args[0] === 'string' && (args[0].includes('performance') || args[0].includes('AudioContext'))) return;
                 originalWarn.apply(console, args);
             };
         })();
@@ -227,7 +227,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            background-color: transparent; 
+            background-color: #000; 
             display: none; 
             will-change: transform; 
             image-rendering: pixelated; 
@@ -260,6 +260,7 @@
             z-index: 20;
             text-align: center;
             color: #000000;
+            background-color: var(--screen-color); /* Fix: Ensure visible bg */
         }
 
         .nann-pill {
@@ -552,8 +553,8 @@
                     <!-- NEW: Start Menu (Save/Load) -->
                     <div id="start-menu" class="menu-ui">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 tracking-wider">PAUSE</h2>
-                        <div class="menu-btn" id="btn-menu-save">SAVE STATE</div>
-                        <div class="menu-btn" id="btn-menu-load-state">LOAD STATE</div>
+                        <!-- Disabled for mGBA core initially as it uses internal battery saves -->
+                        <div class="text-xs text-center text-gray-500 mb-2">Manual States not supported in mGBA core yet.<br>Use in-game saves.</div>
                         <button id="btn-close-start-menu" class="mt-3 px-6 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition text-sm font-bold">Resume</button>
                     </div>
 
@@ -600,12 +601,12 @@
                             LOAD HTML (WEB)
                         </label>
                         
-                        <input type="file" id="file-input-rom" accept=".gb,.gbc,.zip">
+                        <input type="file" id="file-input-rom" accept=".gb,.gbc,.gba,.zip">
                         <label for="file-input-rom" class="upload-label rom-label">
-                            LOAD ROM (.ZIP/.GB)
+                            LOAD ROM (.ZIP/.GBA)
                         </label>
                         
-                        <p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports HTML5 & GB/GBC</p>
+                        <p id="file-status" class="text-xs text-gray-600 mb-3 text-center px-4 mt-1">Supports GB/GBC/GBA</p>
                         <button id="btn-close-upload" class="px-6 py-1 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 transition text-sm font-bold">Cancel</button>
                     </div>
                     
@@ -669,18 +670,18 @@
         let auth;
         let userId = null;
         let gameMode = 'html'; 
-        let wasmBoyInitialized = false;
         let currentRomName = 'unknown_game'; 
+        let mgbaInitialized = false;
 
         let keyMap = {
             'Up': { key: 'w', code: 'KeyW', keyCode: 87 },
             'Down': { key: 's', code: 'KeyS', keyCode: 83 },
             'Left': { key: 'a', code: 'KeyA', keyCode: 65 },
-            'Right': { key: 'f', code: 'KeyF', keyCode: 70 }, 
+            'Right': { key: 'd', code: 'KeyD', keyCode: 68 }, 
             'A': { key: ' ', code: 'Space', keyCode: 32 }, 
-            'B': { key: 'd', code: 'KeyD', keyCode: 68 }, 
+            'B': { key: 'j', code: 'KeyJ', keyCode: 74 }, // Mapped to suit generic play
             'Start': { key: 'Enter', code: 'Enter', keyCode: 13 },
-            'Select': { key: 'e', code: 'KeyE', keyCode: 69 },
+            'Select': { key: 'Backspace', code: 'Backspace', keyCode: 8 },
         };
         
         const keyMapStorageKey = `emulator-keymap-${appId}`;
@@ -748,82 +749,6 @@
         function loadTheme() {
             const savedTheme = localStorage.getItem(themeStorageKey);
             if (savedTheme) applyTheme(savedTheme);
-        }
-
-        // --- DATABASE FOR SAVES ---
-        const DB_NAME = 'NannBoySaves';
-        const DB_VERSION = 1;
-        const STORE_NAME = 'save_states';
-
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        db.createObjectStore(STORE_NAME);
-                    }
-                };
-                request.onsuccess = (e) => resolve(e.target.result);
-                request.onerror = (e) => reject(e.target.error);
-            });
-        }
-
-        async function saveStateToDB() {
-            if (gameMode !== 'rom' || !window.WasmBoy || !WasmBoy.isReady()) {
-                showToast("No ROM Running");
-                return;
-            }
-
-            try {
-                const state = await WasmBoy.saveState();
-                
-                const db = await openDB();
-                const tx = db.transaction(STORE_NAME, 'readwrite');
-                const store = tx.objectStore(STORE_NAME);
-                
-                await new Promise((resolve, reject) => {
-                    const req = store.put(state, currentRomName);
-                    req.onsuccess = resolve;
-                    req.onerror = reject;
-                });
-                
-                showToast("STATE SAVED!");
-                closeAllMenus();
-            } catch (err) {
-                console.error(err);
-                showToast("Save Failed");
-            }
-        }
-
-        async function loadStateFromDB() {
-            if (gameMode !== 'rom' || !window.WasmBoy || !WasmBoy.isReady()) {
-                showToast("Load ROM First");
-                return;
-            }
-
-            try {
-                const db = await openDB();
-                const tx = db.transaction(STORE_NAME, 'readonly');
-                const store = tx.objectStore(STORE_NAME);
-                
-                const state = await new Promise((resolve, reject) => {
-                    const req = store.get(currentRomName);
-                    req.onsuccess = () => resolve(req.result);
-                    req.onerror = reject;
-                });
-
-                if (state) {
-                    await WasmBoy.loadState(state);
-                    showToast("STATE LOADED!");
-                    closeAllMenus();
-                } else {
-                    showToast("No Save Found");
-                }
-            } catch (err) {
-                console.error(err);
-                showToast("Load Failed");
-            }
         }
 
         function showToast(msg) {
@@ -947,6 +872,47 @@
             }
         }
 
+        // --- NEW: mGBA INPUT MAPPING ---
+        function sendMgbaInput(label, isDown) {
+            // mGBA web build usually listens to specific Keyboard Events on the window.
+            // Default mappings for mGBA web:
+            // A: X, B: Z, L: A, R: S, Start: Enter, Select: Backspace
+            // Up: ArrowUp, Down: ArrowDown, Left: ArrowLeft, Right: ArrowRight
+            
+            const mgbaMap = {
+                'Up': { key: 'ArrowUp', code: 'ArrowUp', keyCode: 38 },
+                'Down': { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40 },
+                'Left': { key: 'ArrowLeft', code: 'ArrowLeft', keyCode: 37 },
+                'Right': { key: 'ArrowRight', code: 'ArrowRight', keyCode: 39 },
+                'A': { key: 'x', code: 'KeyX', keyCode: 88 },
+                'B': { key: 'z', code: 'KeyZ', keyCode: 90 },
+                'Start': { key: 'Enter', code: 'Enter', keyCode: 13 },
+                'Select': { key: 'Backspace', code: 'Backspace', keyCode: 8 }
+            };
+
+            const mapping = mgbaMap[label];
+            if (!mapping) return;
+
+            const eventType = isDown ? 'keydown' : 'keyup';
+            
+            // Dispatch to Window (mGBA SDL listens here)
+            const event = new KeyboardEvent(eventType, {
+                key: mapping.key,
+                code: mapping.code,
+                keyCode: mapping.keyCode,
+                which: mapping.keyCode,
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            
+            window.dispatchEvent(event);
+            
+            // Also dispatch to canvas just in case focus is there
+            const canvas = document.getElementById('rom-canvas');
+            if (canvas) canvas.dispatchEvent(event);
+        }
+
         function sendKey(label, isDown) {
             if (gameMode === 'html') {
                 const iframe = document.getElementById('game-iframe');
@@ -961,20 +927,8 @@
                     keyCode: mappedKey.keyCode
                 }, '*');
             } else if (gameMode === 'rom') {
-                if (window.WasmBoy) {
-                    const wbState = {
-                        UP: virtualKeyStates['Up'] || false,
-                        DOWN: virtualKeyStates['Down'] || false,
-                        LEFT: virtualKeyStates['Left'] || false,
-                        RIGHT: virtualKeyStates['Right'] || false,
-                        A: virtualKeyStates['A'] || false,
-                        B: virtualKeyStates['B'] || false,
-                        SELECT: virtualKeyStates['Select'] || false,
-                        START: virtualKeyStates['Start'] || false
-                    };
-                    
-                    WasmBoy.setJoypadState(wbState);
-                }
+                // mGBA Handling
+                sendMgbaInput(label, isDown);
             }
         }
 
@@ -1077,7 +1031,8 @@
 
             powerLed.classList.remove('on'); 
             
-            if (window.WasmBoy && WasmBoy.isPlaying()) WasmBoy.pause();
+            // Note: mGBA doesn't have a simple pause API like WasmBoy, so we reload to stop it if needed
+            // But for now we just hide it.
 
             if (!file) return;
             if (file.type !== 'text/html' && !file.name.endsWith('.html')) { 
@@ -1120,7 +1075,8 @@
             reader.readAsText(file);
         }
 
-        // UPDATED: Simple, direct loading of JSDelivr source.
+        // --- NEW: mGBA CORE INTEGRATION ---
+        
         async function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -1131,57 +1087,92 @@
             });
         }
 
-        async function initWasmBoy() {
-            if (wasmBoyInitialized) return;
-            
-            // Try to load the script explicitly if it isn't already there
-            if (!window.WasmBoy) {
-                try {
-                    await loadScript('https://cdn.jsdelivr.net/npm/wasmboy@0.6.0/dist/wasmboy.min.js');
-                } catch (e) {
-                    throw new Error("Could not download Emulator Core. Check Internet.");
-                }
-            }
+        async function initMgba() {
+            if (mgbaInitialized) return;
 
-            if (!window.WasmBoy) {
-                throw new Error("Emulator Engine failed to initialize.");
-            }
-            
             const romCanvas = document.getElementById('rom-canvas');
-            
-            const WasmBoyLib = window.WasmBoy;
-            await WasmBoyLib.config({
-                headless: false,
-                useGbcWhenOptional: true,
-                isAudioEnabled: true,
-                frameSkip: 1,
-                audioBatchProcessing: true,
-                timersBatchProcessing: false,
-                audioAccumulateSamples: 5000,
-                graphicsBatchProcessing: false,
-                tileBatchProcessing: true,
-                backgroundBatchProcessing: true,
-                spriteBatchProcessing: true,
-                canvas: romCanvas, 
-                // Explicitly use JSDelivr for the WASM to match the JS
-                wasmPath: 'https://cdn.jsdelivr.net/npm/wasmboy@0.6.0/dist/wasmboy.wasm'
-            });
-            
-            wasmBoyInitialized = true;
+
+            // Setup the global Module object that mGBA expects
+            window.Module = {
+                canvas: romCanvas,
+                // Override locateFile to find the WASM file
+                locateFile: function(path, prefix) {
+                    if (path.endsWith('.wasm')) {
+                        // Use the official mGBA JS demo source for the WASM
+                        return 'https://mgba-emu.github.io/mgba.js/mgba.wasm';
+                    }
+                    return prefix + path;
+                },
+                print: function(text) { console.log('[mGBA]', text); },
+                printErr: function(text) { console.error('[mGBA]', text); }
+            };
+
+            try {
+                // Load the main mGBA JS
+                await loadScript('https://mgba-emu.github.io/mgba.js/mgba.js');
+                mgbaInitialized = true;
+                
+                // Wait slightly for Module to fully hydrate
+                await new Promise(r => setTimeout(r, 100));
+            } catch (e) {
+                console.error("mGBA Load Failed", e);
+                throw new Error("Could not download mGBA Core.");
+            }
+        }
+
+        async function launchMgba(romData, name) {
+            try {
+                await initMgba();
+                
+                // Emscripten File System operations
+                // 1. Ensure /data directory exists (optional, root usually fine)
+                // 2. Write ROM to virtual FS
+                const fileName = 'game.rom';
+                
+                // Wait for runtime initialized
+                if (!window.Module.FS) {
+                     await new Promise(resolve => {
+                         if(window.Module.calledRun) resolve();
+                         else window.Module.onRuntimeInitialized = resolve;
+                     });
+                }
+
+                try {
+                    window.Module.FS.createDataFile('/', fileName, new Uint8Array(romData), true, true);
+                } catch(e) {
+                    // File might exist from previous run, unlink (delete) it first
+                    try { window.Module.FS.unlink('/' + fileName); } catch(err) {}
+                    window.Module.FS.createDataFile('/', fileName, new Uint8Array(romData), true, true);
+                }
+
+                // 3. Call Main with arguments
+                window.Module.callMain([fileName]);
+                
+                // Force canvas to show
+                const romCanvas = document.getElementById('rom-canvas');
+                romCanvas.style.display = 'block';
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('game-iframe').style.display = 'none';
+                document.getElementById('power-led').classList.add('on');
+                
+                closeAllMenus();
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('file-status').textContent = "Emulator Crash: " + err.message;
+            }
         }
 
         function handleRomUpload(event) {
             const file = event.target.files[0];
             const fileStatus = document.getElementById('file-status');
-            const iframe = document.getElementById('game-iframe');
-            const romCanvas = document.getElementById('rom-canvas');
             const powerLed = document.getElementById('power-led');
-            const startScreen = document.getElementById('start-screen');
 
             powerLed.classList.remove('on');
 
             if (!file) return;
             
+            // Added .gba support
             const isZip = file.name.match(/\.zip$/i);
             const isRom = file.name.match(/\.(gb|gbc|gba)$/i);
 
@@ -1191,28 +1182,8 @@
             }
 
             fileStatus.textContent = `Reading ${file.name}...`;
+            gameMode = 'rom';
             
-            const launchEmulator = async (romData) => {
-                try {
-                    await initWasmBoy();
-                    
-                    gameMode = 'rom';
-                    closeAllMenus();
-                    
-                    startScreen.style.display = 'none';
-                    iframe.style.display = 'none';
-                    romCanvas.style.display = 'block';
-                    
-                    await WasmBoy.loadROM(romData);
-                    await WasmBoy.play();
-                    
-                    powerLed.classList.add('on');
-                } catch (err) {
-                    console.error(err);
-                    fileStatus.textContent = `Load Error: ${err.message || "Unknown Engine Error"}`;
-                }
-            };
-
             if (isZip) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -1221,31 +1192,15 @@
                     JSZip.loadAsync(arrayBuffer).then(async function(zip) {
                         const files = Object.keys(zip.files);
                         
-                        const gbaFile = files.find(name => name.match(/\.gba$/i) && !name.includes('__MACOSX'));
-                        if (gbaFile) {
-                            fileStatus.textContent = "Error: GBA games not supported yet.";
-                            return;
-                        }
-
+                        // Allow .gba in zip
                         const romCandidates = files.filter(name => {
-                            const isRom = name.match(/\.(gb|gbc)$/i);
+                            const isRom = name.match(/\.(gb|gbc|gba)$/i);
                             const isMacJunk = name.includes('__MACOSX') || name.split('/').pop().startsWith('.');
                             return isRom && !isMacJunk;
                         });
 
                         if (romCandidates.length === 0) {
-                            fileStatus.textContent = "Error: No .gb/.gbc file found in zip.";
-                            return;
-                        }
-
-                        let bestRom = null;
-                        let maxSize = 0;
-
-                        if (romCandidates.length === 1) {
-                            fileStatus.textContent = `Extracting ${romCandidates[0]}...`;
-                            const content = await zip.file(romCandidates[0]).async("arraybuffer");
-                            currentRomName = romCandidates[0];
-                            launchEmulator(content);
+                            fileStatus.textContent = "Error: No ROM found in zip.";
                             return;
                         }
 
@@ -1254,7 +1209,7 @@
                         currentRomName = chosenFile;
                         
                         const content = await zip.file(chosenFile).async("arraybuffer");
-                        launchEmulator(content);
+                        launchMgba(content, chosenFile);
 
                     }).catch(function(err) {
                         console.error(err);
@@ -1263,16 +1218,10 @@
                 };
                 reader.readAsArrayBuffer(file);
             } else {
-                if (file.name.match(/\.gba$/i)) {
-                    fileStatus.textContent = "Error: GBA games not supported yet.";
-                    return;
-                }
-
                 currentRomName = file.name;
-                
                 const reader = new FileReader();
                 reader.onload = async function(e) {
-                    launchEmulator(e.target.result);
+                    launchMgba(e.target.result, file.name);
                 };
                 reader.readAsArrayBuffer(file);
             }
@@ -1351,8 +1300,9 @@
             document.getElementById('btn-menu-controls')?.addEventListener('click', () => openMenu('key-binding-menu')); 
 
             document.getElementById('btn-close-start-menu')?.addEventListener('click', closeAllMenus);
-            document.getElementById('btn-menu-save')?.addEventListener('click', saveStateToDB);
-            document.getElementById('btn-menu-load-state')?.addEventListener('click', loadStateFromDB);
+            // Save/Load disabled for now
+            // document.getElementById('btn-menu-save')?.addEventListener('click', saveStateToDB);
+            // document.getElementById('btn-menu-load-state')?.addEventListener('click', loadStateFromDB);
 
             document.getElementById('btn-back-styles')?.addEventListener('click', () => openMenu('main-menu'));
             document.querySelectorAll('.theme-option').forEach(option => {
@@ -1393,14 +1343,21 @@
             gbcBody.style.height = `${requiredHeight}px`;
         }
         
-        window.onload = function() {
+        // --- FIXED INITIALIZATION LOGIC ---
+        function appMain() {
             initFirebase();
             setupControlListeners();
             scaleConsole(); 
             window.addEventListener('resize', scaleConsole);
             if (window.visualViewport) window.visualViewport.addEventListener('resize', scaleConsole);
             checkStandalone();
-        };
+        }
+
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', appMain);
+        } else {
+            appMain();
+        }
     </script>
 </body>
 </html>
